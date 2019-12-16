@@ -2,8 +2,9 @@ package de.jade_hs.afe.AcousticFeatureExtraction;
 
 import android.util.Log;
 
+import org.threeten.bp.Instant;
+
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,7 +21,7 @@ abstract class Stage extends TreeSet {
 
     final static String LOG = "Stage";
 
-    static Date startTime;
+    static Instant startTime;
     static int samplingrate;
     static int channels;
 
@@ -30,6 +31,7 @@ abstract class Stage extends TreeSet {
     private LinkedBlockingQueue<float[][]> inQueue;
     private Set<LinkedBlockingQueue> outQueue = new HashSet<>();
 
+    Stage inStage;
     ArrayList<Stage> consumerSet = new ArrayList<>();
 
     // params to set via constructor
@@ -50,6 +52,7 @@ abstract class Stage extends TreeSet {
             hopSize = blockSize;
         else
             hopSize = Integer.parseInt((String) parameter.get("hopsize"));
+
     }
 
 
@@ -183,6 +186,11 @@ abstract class Stage extends TreeSet {
         // set queue in new consumer
         consumer.setInQueue(queue);
 
+        // set input/parent stage so we have access to parameters
+        // TODO: is accessible another way? Maybe define the whole ArrayList as class variable?
+        //  Just passing the stage is simpler, though.
+        consumer.setInStage(this);
+
         // add queue to output queues of this stage
         outQueue.add(queue);
 
@@ -193,6 +201,11 @@ abstract class Stage extends TreeSet {
     void setInQueue(LinkedBlockingQueue inQueue) {
 
         this.inQueue = inQueue;
+    }
+
+    void setInStage(Stage inStage) {
+
+        this.inStage = inStage;
     }
 
     protected abstract void process(float[][] buffer);

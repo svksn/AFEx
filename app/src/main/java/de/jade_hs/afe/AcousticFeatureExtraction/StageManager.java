@@ -2,6 +2,8 @@ package de.jade_hs.afe.AcousticFeatureExtraction;
 
 import android.os.Environment;
 
+import org.threeten.bp.Instant;
+
 import java.io.File;
 import java.util.Date;
 
@@ -36,7 +38,7 @@ public class StageManager {
     public void start() {
 
         // Start time is set here, will get overwritten in 1st Stage, e.g. StageAudioCapture.
-        Stage.startTime = new Date();
+        Stage.startTime = Instant.now();
 
         mainStage.start();
         isRunning = true;

@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.jakewharton.threetenabp.AndroidThreeTen;
+
 public class MainActivity extends AppCompatActivity {
 
     FloatingActionButton fabStart;
@@ -23,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        AndroidThreeTen.init(this);
 
         setupUI();
     }

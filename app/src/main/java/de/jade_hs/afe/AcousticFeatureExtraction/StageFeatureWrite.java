@@ -2,13 +2,15 @@ package de.jade_hs.afe.AcousticFeatureExtraction;
 
 import android.os.Environment;
 
+import org.threeten.bp.Instant;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.format.DateTimeFormatter;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -17,13 +19,18 @@ import de.jade_hs.afe.Tools.AudioFileIO;
 /**
  * Write feature data to disk
  *
+ * - Per default the writer assumes that incoming data represents one frame.
+ *   If the array is a multidimensional, the data is concatenated.
+ *   TODO: Check if allocating for each small buffer is problematic of if it is reasonable to cache
+ *     small buffers (e.g. RMS).
+ *     Alternatively, all features could be required to concatenate before sending, so the number of
+ *     frames can be calculated from the incoming array size.
+ *
+ * - Length of a feature file is determined by time, corresponding to e.g. 60 seconds of audio data.
+ *
  * - Timestamp calculation is based on time set in Stage and relative block sizes. Implement
- *   sanity check to compare calculated to actual time. Take into account the delay of the
- *   processing queue.
- * - How to determine the size of feature files and when to start a new one?
- *    a) fixed number of blocks / samples
- *    b) file size, e.g. write current block as long as < 1 MB, start new file if > 1 MB
- *    c) fixed time, e.g. 1 minute as with the old system.
+ *   sanity check to compare calculated to actual time? Take into account the delay of the
+ *   processing queue?
  */
 
 public class StageFeatureWrite extends Stage {
@@ -33,7 +40,7 @@ public class StageFeatureWrite extends Stage {
 
     private RandomAccessFile featureRAF = null;
 
-    private Date startTime;
+    private Instant startTime;
 
     private String timestamp;
     private String feature;
@@ -42,17 +49,21 @@ public class StageFeatureWrite extends Stage {
     private int blockCount;
 
     private float hopDuration;
-    private float[] relTimestamp = new float[2];
+    private float[] relTimestampMs = new float[]{0, 0};
 
-    private float featFileSizeMs = 60000; // size of feature files in ms.
+    private float featFileSizeMs = 10000; // size of feature files in ms.
 
-    SimpleDateFormat timeformat = new SimpleDateFormat("yyyyMMdd_HHmmssSSS", Locale.US);
+    DateTimeFormatter timeFormat =
+            DateTimeFormatter.ofPattern("uuuuMMdd_HHmmssSSS")
+                    .withLocale(Locale.getDefault())
+                    .withZone(ZoneId.systemDefault());
 
     public StageFeatureWrite(HashMap parameter) {
         super(parameter);
 
         this.feature = (String) parameter.get("prefix");
         this.nFeatures = Integer.parseInt((String) parameter.get("nfeatures"));
+
     }
 
     @Override
@@ -65,10 +76,10 @@ public class StageFeatureWrite extends Stage {
     }
 
     @Override
-    protected void process(float[][] buffer) {
+    protected void process(float[][] data) {
 
-        System.out.println("buffer: " + buffer.length + "|" + buffer[0].length);
-        appendFeature(buffer);
+        System.out.println("id: " + id + " buffer: " + data.length + "|" + data[0].length);
+        appendFeature(data);
     }
 
     @Override
@@ -88,7 +99,8 @@ public class StageFeatureWrite extends Stage {
             closeFeatureFile();
         }
 
-        timestamp = timeformat.format(startTime);
+        // add length of last feature file to timestamp
+        timestamp = timeFormat.format(startTime.plusMillis((long) relTimestampMs[1]));
 
         try {
 
@@ -99,18 +111,18 @@ public class StageFeatureWrite extends Stage {
             // write header
             featureRAF.writeInt(0);             // block count will be written on close
             featureRAF.writeInt(nFeatures + 2); // feature dimension count + timestamps (relative)
-            featureRAF.writeInt(blockSize);        // [samples]
-            featureRAF.writeInt(hopSize);          // [samples]
+            featureRAF.writeInt(inStage.blockSize);        // [samples]
+            featureRAF.writeInt(inStage.hopSize);          // [samples]
 
             featureRAF.writeInt(samplingrate);
 
             featureRAF.writeBytes(timestamp.substring(9));    // HHMMssSSS, 9 bytes (absolute timestamp)
 
             blockCount = 0;
-            relTimestamp[0] = 0;
+            relTimestampMs[0] = 0;
 
-            hopDuration = (float) hopSize / samplingrate;
-            relTimestamp[1] = (float) blockSize / samplingrate;
+            hopDuration = (float) inStage.hopSize / samplingrate;
+            relTimestampMs[1] = (float) inStage.blockSize / samplingrate;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -122,7 +134,7 @@ public class StageFeatureWrite extends Stage {
     protected void appendFeature(float[][] data) {
 
         // start a new feature file?
-        if (relTimestamp[1] >= featFileSizeMs) {
+        if (relTimestampMs[1] >= featFileSizeMs) {
             // Update timestamp based on samples processed. This only considers block- and hopsize
             // of the previous stage. If another stage uses different hopping, averaging or any
             // other mechanism to obscure samples vs. time, this has to be tracked elsewhere!
@@ -135,14 +147,14 @@ public class StageFeatureWrite extends Stage {
         ByteBuffer bbuffer = ByteBuffer.allocate(4 * (nFeatures + 2));
         FloatBuffer fbuffer = bbuffer.asFloatBuffer();
 
-        fbuffer.put(relTimestamp);
+        fbuffer.put(relTimestampMs);
 
         for (float[] aData : data) {
             fbuffer.put(aData);
         }
 
-        relTimestamp[0] += hopDuration;
-        relTimestamp[1] += hopDuration;
+        relTimestampMs[0] += hopDuration;
+        relTimestampMs[1] += hopDuration;
 
         try {
             featureRAF.getChannel().write(bbuffer);

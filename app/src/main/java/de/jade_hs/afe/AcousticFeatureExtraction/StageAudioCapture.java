@@ -5,8 +5,8 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
-import java.time.Instant;
-import java.util.Date;
+import org.threeten.bp.Instant;
+
 import java.util.HashMap;
 
 /**
@@ -59,7 +59,7 @@ public class StageAudioCapture extends Stage {
 
         Log.d(LOG, "Started producing");
 
-        Stage.startTime = new Date();
+        Stage.startTime = Instant.now();
 
         while (!stopRecording & !Thread.currentThread().isInterrupted()) {
 
