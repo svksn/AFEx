@@ -11,12 +11,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 public class MainActivity extends AppCompatActivity {
 
     FloatingActionButton fabStart;
+    TextView textState;
     ControlService controlService;
     boolean isBound = false;
 
@@ -41,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
             startService(intent);
 
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
     }
 
     @Override
@@ -53,20 +56,32 @@ public class MainActivity extends AppCompatActivity {
 
     protected void setupUI() {
 
+        textState = (TextView) findViewById(R.id.state);
+
         fabStart = findViewById(R.id.fabStart);
         fabStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isBound)
-                    if (controlService == null || !controlService.isRunning()) {
-                        Snackbar.make(view, "Starting Stage Manager", Snackbar.LENGTH_LONG).show();
-                        controlService.startStageManager();
-                    } else {
-                        Snackbar.make(view, "Stopping Stage Manager", Snackbar.LENGTH_LONG).show();
-                        controlService.stopStageManager();
-                    }
+            if (isBound)
+                if (controlService == null || !controlService.isRunning()) {
+                    Snackbar.make(view, "Starting Stage Manager", Snackbar.LENGTH_LONG).show();
+                    controlService.startStageManager();
+                } else {
+                    Snackbar.make(view, "Stopping Stage Manager", Snackbar.LENGTH_LONG).show();
+                    controlService.stopStageManager();
+                }
+            updateUI();
             }
         });
+    }
+
+    protected void updateUI() {
+
+        if (controlService != null && controlService.isRunning()) {
+            textState.setText("running...");
+        } else {
+            textState.setText("idle...");
+        }
     }
 
     // Is ControlService already running?
