@@ -48,6 +48,7 @@ public class StageAudioCapture extends Stage {
         );
     }
 
+
     @Override
     protected void process(float[][] temp) {
 
@@ -86,7 +87,9 @@ public class StageAudioCapture extends Stage {
 
         Log.d(LOG, "Stopped producing");
         audioRecord.stop();
+        stopRecording = false;
     }
+
 
     public void stop() {
         stopRecording = true;
