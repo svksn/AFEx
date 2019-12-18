@@ -47,6 +47,7 @@ public class StageFeatureWrite extends Stage {
 
     private int nFeatures;
     private int blockCount;
+    private int bufferSize;
 
     private float hopDuration;
     private float[] relTimestampMs = new float[]{0, 0};
@@ -61,9 +62,7 @@ public class StageFeatureWrite extends Stage {
     public StageFeatureWrite(HashMap parameter) {
         super(parameter);
 
-        this.feature = (String) parameter.get("prefix");
-        this.nFeatures = Integer.parseInt((String) parameter.get("nfeatures"));
-
+        feature = (String) parameter.get("prefix");
     }
 
     @Override
@@ -78,7 +77,7 @@ public class StageFeatureWrite extends Stage {
     @Override
     protected void process(float[][] data) {
 
-        System.out.println("id: " + id + " buffer: " + data.length + "|" + data[0].length);
+        System.out.println("id: " + id + " buffer: " + data.length + "|" + data[0].length + " features: " + nFeatures);
         appendFeature(data);
     }
 
@@ -86,6 +85,13 @@ public class StageFeatureWrite extends Stage {
     protected void cleanup() {
 
         closeFeatureFile();
+    }
+
+    void rebuffer() {
+
+        // we do not want rebuffering in a writer stage, just get the data and and pass it on.
+        float[][] data = receive();
+        process(data);
     }
 
     private void openFeatureFile() {
@@ -109,14 +115,14 @@ public class StageFeatureWrite extends Stage {
                     "rw");
 
             // write header
-            featureRAF.writeInt(0);             // block count will be written on close
-            featureRAF.writeInt(nFeatures + 2); // feature dimension count + timestamps (relative)
-            featureRAF.writeInt(inStage.blockSize);        // [samples]
-            featureRAF.writeInt(inStage.hopSize);          // [samples]
+            featureRAF.writeInt(0);               // block count, written on close
+            featureRAF.writeInt(0);               // feature dimensions, written on close
+            featureRAF.writeInt(inStage.blockSize);  // [samples]
+            featureRAF.writeInt(inStage.hopSize);    // [samples]
 
             featureRAF.writeInt(samplingrate);
 
-            featureRAF.writeBytes(timestamp.substring(9));    // HHMMssSSS, 9 bytes (absolute timestamp)
+            featureRAF.writeBytes(timestamp.substring(9));  // HHMMssSSS, 9 bytes (absolute timestamp)
 
             blockCount = 0;
             relTimestampMs[0] = 0;
@@ -138,13 +144,20 @@ public class StageFeatureWrite extends Stage {
             // Update timestamp based on samples processed. This only considers block- and hopsize
             // of the previous stage. If another stage uses different hopping, averaging or any
             // other mechanism to obscure samples vs. time, this has to be tracked elsewhere!
-
-
             openFeatureFile();
         }
 
-        // buffer size: number of (nfeatures + 2 timestamps) * 4 bytes
-        ByteBuffer bbuffer = ByteBuffer.allocate(4 * (nFeatures + 2));
+        // calculate buffer size from actual data to take care of jagged arrays (e.g. PSDs):
+        // (samples in data + 2 timestamps) * 4 bytes
+        if (bufferSize == 0) {
+            nFeatures = 2; // timestamps
+            for (float[] aData : data) {
+                nFeatures += aData.length;
+            }
+            bufferSize = nFeatures * 4; // 4 bytes to a float
+        }
+
+        ByteBuffer bbuffer = ByteBuffer.allocate(bufferSize);
         FloatBuffer fbuffer = bbuffer.asFloatBuffer();
 
         fbuffer.put(relTimestampMs);
@@ -170,7 +183,8 @@ public class StageFeatureWrite extends Stage {
         try {
 
             featureRAF.seek(0);
-            featureRAF.writeInt(blockCount);
+            featureRAF.writeInt(blockCount); // block count for this feature file
+            featureRAF.writeInt(nFeatures);  // features + timestamps per block
             featureRAF.close();
 
         } catch (IOException e) {
