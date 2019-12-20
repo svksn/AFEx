@@ -191,8 +191,9 @@ public class StageFeatureWrite extends Stage {
             fbuffer.put(aData);
         }
 
-        relTimestamp[0] += hopDuration;
-        relTimestamp[1] += hopDuration;
+        // round to 3 decimals -> milliseconds.
+        relTimestamp[0] = Math.round((relTimestamp[0] + hopDuration) * 1000.0f) / 1000.0f;
+        relTimestamp[1] = Math.round((relTimestamp[1] + hopDuration) * 1000.0f) / 1000.0f;
 
         try {
             featureRAF.getChannel().write(bbuffer);
