@@ -42,6 +42,7 @@ public class StageFeatureWrite extends Stage {
     private RandomAccessFile featureRAF = null;
 
     private Instant startTime;
+    private Instant currentTime;
 
     private String timestamp;
     private String feature;
@@ -71,6 +72,7 @@ public class StageFeatureWrite extends Stage {
     void start(){
 
         startTime = Stage.startTime;
+        currentTime = startTime;
         openFeatureFile();
 
         super.start();
@@ -125,9 +127,9 @@ public class StageFeatureWrite extends Stage {
             closeFeatureFile();
         }
 
-        // add length of last feature file to timestamp
-        int n = 0;
-        timestamp = timeFormat.format(startTime.plusMillis((long) relTimestamp[1]+n++));
+        // add length of last feature file to current time
+        currentTime = currentTime.plusMillis((long) (relTimestamp[1]*1000));
+        timestamp = timeFormat.format(currentTime);
 
         try {
 
