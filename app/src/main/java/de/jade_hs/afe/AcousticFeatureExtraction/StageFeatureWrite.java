@@ -1,6 +1,7 @@
 package de.jade_hs.afe.AcousticFeatureExtraction;
 
 import android.os.Environment;
+import android.util.Log;
 
 import org.threeten.bp.Instant;
 import org.threeten.bp.ZoneId;
@@ -50,14 +51,15 @@ public class StageFeatureWrite extends Stage {
     private int bufferSize;
 
     private float hopDuration;
-    private float[] relTimestampMs = new float[]{0, 0};
+    private float[] relTimestamp = new float[]{0, 0};
 
-    private float featFileSizeMs = 10000; // size of feature files in ms.
+    private float featFileSize = 10; // size of feature files in seconds.
 
     DateTimeFormatter timeFormat =
             DateTimeFormatter.ofPattern("uuuuMMdd_HHmmssSSS")
                     .withLocale(Locale.getDefault())
                     .withZone(ZoneId.systemDefault());
+
 
     public StageFeatureWrite(HashMap parameter) {
         super(parameter);
@@ -75,13 +77,6 @@ public class StageFeatureWrite extends Stage {
     }
 
     @Override
-    protected void process(float[][] data) {
-
-        System.out.println("id: " + id + " buffer: " + data.length + "|" + data[0].length + " features: " + nFeatures);
-        appendFeature(data);
-    }
-
-    @Override
     protected void cleanup() {
 
         closeFeatureFile();
@@ -90,9 +85,34 @@ public class StageFeatureWrite extends Stage {
     void rebuffer() {
 
         // we do not want rebuffering in a writer stage, just get the data and and pass it on.
-        float[][] data = receive();
-        process(data);
+
+        boolean abort = false;
+
+        Log.d(LOG, "----------> " + id + ": Start processing");
+
+        while (!Thread.currentThread().isInterrupted() & !abort) {
+
+            float[][] data = receive();
+
+            if (data != null) {
+
+                process(data);
+
+            } else {
+                abort = true;
+            }
+        }
+
+        closeFeatureFile();
+
+        Log.d(LOG, id + ": Stopped consuming");
     }
+
+    protected void process(float[][] data) {
+
+        appendFeature(data);
+    }
+
 
     private void openFeatureFile() {
 
@@ -106,7 +126,8 @@ public class StageFeatureWrite extends Stage {
         }
 
         // add length of last feature file to timestamp
-        timestamp = timeFormat.format(startTime.plusMillis((long) relTimestampMs[1]));
+        int n = 0;
+        timestamp = timeFormat.format(startTime.plusMillis((long) relTimestamp[1]+n++));
 
         try {
 
@@ -125,10 +146,10 @@ public class StageFeatureWrite extends Stage {
             featureRAF.writeBytes(timestamp.substring(9));  // HHMMssSSS, 9 bytes (absolute timestamp)
 
             blockCount = 0;
-            relTimestampMs[0] = 0;
+            relTimestamp[0] = 0;
 
             hopDuration = (float) inStage.hopSize / samplingrate;
-            relTimestampMs[1] = (float) inStage.blockSize / samplingrate;
+            relTimestamp[1] = (float) inStage.blockSize / samplingrate;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -139,8 +160,10 @@ public class StageFeatureWrite extends Stage {
 
     protected void appendFeature(float[][] data) {
 
+        System.out.println("timestamp: " + relTimestamp[1] + " | size: " + featFileSize);
+
         // start a new feature file?
-        if (relTimestampMs[1] >= featFileSizeMs) {
+        if (relTimestamp[1] >= featFileSize) {
             // Update timestamp based on samples processed. This only considers block- and hopsize
             // of the previous stage. If another stage uses different hopping, averaging or any
             // other mechanism to obscure samples vs. time, this has to be tracked elsewhere!
@@ -160,14 +183,14 @@ public class StageFeatureWrite extends Stage {
         ByteBuffer bbuffer = ByteBuffer.allocate(bufferSize);
         FloatBuffer fbuffer = bbuffer.asFloatBuffer();
 
-        fbuffer.put(relTimestampMs);
+        fbuffer.put(relTimestamp);
 
         for (float[] aData : data) {
             fbuffer.put(aData);
         }
 
-        relTimestampMs[0] += hopDuration;
-        relTimestampMs[1] += hopDuration;
+        relTimestamp[0] += hopDuration;
+        relTimestamp[1] += hopDuration;
 
         try {
             featureRAF.getChannel().write(bbuffer);
