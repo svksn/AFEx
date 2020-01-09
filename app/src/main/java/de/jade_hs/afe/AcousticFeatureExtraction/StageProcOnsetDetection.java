@@ -98,14 +98,12 @@ public class StageProcOnsetDetection extends Stage {
     @Override
     protected void process(float[][] buffer) {
 
-        Log.e(LOG, "BUFFER: " + buffer.length + ", " + buffer[0].length);
-
         float[] block_left = new float[blockSize];
         float[] block_right = new float[blockSize];
 
         for (int iSample = 0; iSample < blockSize; iSample++) {
-            block_left[iSample] = buffer[iSample][0];
-            block_right[iSample] = buffer[iSample][1];
+            block_left[iSample] = buffer[0][iSample];
+            block_right[iSample] = buffer[1][iSample];
         }
 
         float data = onsetDetection(block_left, block_right);
