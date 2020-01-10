@@ -29,15 +29,37 @@ public class StageAudioWrite extends Stage {
                 channels,
                 16,
                 true);
-
     }
+
+    void rebuffer() {
+
+        // we do not want rebuffering in a writer stage, just get the data and and pass it on.
+
+        boolean abort = false;
+
+        Log.d(LOG, "----------> " + id + ": Start processing");
+
+        while (!Thread.currentThread().isInterrupted() & !abort) {
+
+            float[][] data = receive();
+
+            if (data != null) {
+
+                process(data);
+
+            } else {
+                abort = true;
+            }
+        }
+
+        io.closeDataOutStream();
+
+        Log.d(LOG, id + ": Stopped consuming");
+    }
+
 
     @Override
     protected void process(float[][] buffer) {
-
-//        boolean abort = false;
-
-        Log.d(LOG, "Start consuming");
 
         byte[] dataOut = new byte[buffer.length * buffer[0].length * 2];
 
@@ -58,12 +80,6 @@ public class StageAudioWrite extends Stage {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        Log.d(LOG, "Stopped consuming");
-
-        io.closeDataOutStream();
-
     }
-
 
 }
