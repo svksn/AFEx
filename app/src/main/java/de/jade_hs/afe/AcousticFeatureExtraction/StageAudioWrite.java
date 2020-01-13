@@ -2,9 +2,13 @@ package de.jade_hs.afe.AcousticFeatureExtraction;
 
 import android.util.Log;
 
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.format.DateTimeFormatter;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Locale;
 
 import de.jade_hs.afe.Tools.AudioFileIO;
 import de.jade_hs.afe.Tools.Timestamp;
@@ -20,16 +24,29 @@ public class StageAudioWrite extends Stage {
     AudioFileIO io;
     DataOutputStream stream;
 
+    DateTimeFormatter timeFormat =
+            DateTimeFormatter.ofPattern("uuuuMMdd_HHmmssSSS")
+                    .withLocale(Locale.getDefault())
+                    .withZone(ZoneId.systemDefault());
+
     public StageAudioWrite(HashMap parameter) {
         super(parameter);
+    }
 
-        io = new AudioFileIO((String) parameter.get("filename") + "_" +Timestamp.getTimestamp(3));
+    @Override
+    void start() {
+
+        io = new AudioFileIO("cache_" + timeFormat.format(Stage.startTime));
+
         stream = io.openDataOutStream(
                 samplingrate,
                 channels,
                 16,
                 true);
+
+        super.start();
     }
+
 
     void rebuffer() {
 
