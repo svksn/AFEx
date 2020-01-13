@@ -212,7 +212,7 @@ public class StageFeatureWrite extends Stage {
             featureRAF.writeInt(blockCount); // block count for this feature file
             featureRAF.writeInt(nFeatures);  // features + timestamps per block
             featureRAF.close();
-
+            featureRAF = null;
         } catch (IOException e) {
             e.printStackTrace();
         }
