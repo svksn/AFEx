@@ -6,6 +6,14 @@ import java.util.HashMap;
 
 /**
  * Feature extraction: Auto- and cross correlation
+ *
+ * Data is smoothed so no information can be recovered when recreating a time signal from these
+ * spectra. It contains a few magic numbers and makes certain assumptions about the input buffer
+ * (25 ms, 50 % overlap) and sends spectra representing chunks of 125 ms.
+ *
+ * Use the following feature definition:
+ * <stage feature="StageProcPSD" id="7" blocksize="400" hopsize="200" blockout="2000" hopout="2000"/>
+ *
  */
 
 public class StageProcPSD extends Stage {
@@ -16,7 +24,7 @@ public class StageProcPSD extends Stage {
 
     public StageProcPSD(HashMap parameter) {
         super(parameter);
-        cpsd = new CPSD(blockSize);
+        cpsd = new CPSD();
     }
 
 
@@ -34,14 +42,12 @@ public class StageProcPSD extends Stage {
         int nfft, samples, block = 0;
         FloatFFT_1D fft;
 
-        CPSD(int samples) {
-
-            this.samples = samples;
-            nfft = nextpow2(samples);
-            window = hann(samples, nfft);
+        CPSD() {
+            nfft = nextpow2(blockSize);
+            window = hann(blockSize, nfft);
             fft = new FloatFFT_1D(nfft);
             alpha = (float) Math.exp(-(blockSize - hopSize) / (samplingrate * 0.125));
-
+            samples = blockSize;
         }
 
         void calculate(float[][] input) {
