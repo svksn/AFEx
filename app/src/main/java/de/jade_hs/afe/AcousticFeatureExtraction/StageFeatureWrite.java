@@ -97,9 +97,7 @@ public class StageFeatureWrite extends Stage {
             float[][] data = receive();
 
             if (data != null) {
-
                 process(data);
-
             } else {
                 abort = true;
             }
@@ -140,8 +138,8 @@ public class StageFeatureWrite extends Stage {
             // write header
             featureRAF.writeInt(0);               // block count, written on close
             featureRAF.writeInt(0);               // feature dimensions, written on close
-            featureRAF.writeInt(inStage.blockSize);  // [samples]
-            featureRAF.writeInt(inStage.hopSize);    // [samples]
+            featureRAF.writeInt(inStage.blockSizeOut);  // [samples]
+            featureRAF.writeInt(inStage.hopSizeOut);    // [samples]
 
             featureRAF.writeInt(samplingrate);
 
@@ -150,8 +148,8 @@ public class StageFeatureWrite extends Stage {
             blockCount = 0;
             relTimestamp[0] = 0;
 
-            hopDuration = (float) inStage.hopSize / samplingrate;
-            relTimestamp[1] = (float) inStage.blockSize / samplingrate;
+            hopDuration = (float) inStage.hopSizeOut / samplingrate;
+            relTimestamp[1] = (float) inStage.blockSizeOut / samplingrate;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -162,7 +160,7 @@ public class StageFeatureWrite extends Stage {
 
     protected void appendFeature(float[][] data) {
 
-        System.out.println("timestamp: " + relTimestamp[1] + " | size: " + featFileSize);
+        //System.out.println("timestamp: " + relTimestamp[1] + " | size: " + featFileSize);
 
         // start a new feature file?
         if (relTimestamp[1] >= featFileSize) {

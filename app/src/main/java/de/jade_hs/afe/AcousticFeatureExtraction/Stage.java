@@ -21,6 +21,8 @@ abstract class Stage extends TreeSet {
 
     final static String LOG = "Stage";
 
+    final int timeout = 1000; // in ms, wait this long to receive data before stopping a stage.
+
     static Instant startTime;
     static int samplingrate;
     static int channels;
@@ -35,7 +37,7 @@ abstract class Stage extends TreeSet {
     ArrayList<Stage> consumerSet = new ArrayList<>();
 
     // params to set via constructor
-    final int id, blockSize, hopSize;
+    int id, blockSize, hopSize, blockSizeOut, hopSizeOut;
 
     public Stage(HashMap parameter) {
 
@@ -52,6 +54,16 @@ abstract class Stage extends TreeSet {
             hopSize = blockSize;
         else
             hopSize = Integer.parseInt((String) parameter.get("hopsize"));
+
+        if (parameter.get("blockout") == null)
+            blockSizeOut = blockSize;
+        else
+            blockSizeOut = Integer.parseInt((String) parameter.get("blockout"));
+
+        if (parameter.get("hopout") == null)
+            hopSizeOut = hopSize;
+        else
+            hopSizeOut = Integer.parseInt((String) parameter.get("hopout"));
 
     }
 
@@ -89,14 +101,12 @@ abstract class Stage extends TreeSet {
 
     void rebuffer() {
 
-        System.out.println("----------> ID: " + id);
-
         boolean abort = false;
         int samples = 0;
         int channels = 2;
         float[][] buffer = new float[channels][blockSize];
 
-        Log.d(LOG, "Start processing");
+        Log.d(LOG, id + ": Start processing");
 
         while (!Thread.currentThread().isInterrupted() & !abort) {
 
@@ -141,28 +151,26 @@ abstract class Stage extends TreeSet {
             }
         }
 
-        Log.d(LOG, "Stopped consuming");
+        Log.d(LOG, id + ": Stopped consuming");
 
     }
 
 
     float[][] receive() {
 
-        int timeout = 1000;
-
         try {
 
+            //Log.d("Stage", "ID: " + id + " | receive()");
             return inQueue.poll(timeout, TimeUnit.MILLISECONDS);
 
-
-            // rebuffer and call processing?
-
+            // rebuffer and call processing here?
 
         } catch (InterruptedException e) {
             e.printStackTrace();
-            Log.d("Stage", "No elements in queue for " + timeout + " ms. Empty?");
-            return null;
+            Log.d("Stage", "ID: " + id + " | No elements in queue for " + timeout + " ms. Empty?");
         }
+
+        return null;
     }
 
 
