@@ -1,18 +1,12 @@
 package de.jade_hs.afe.Tools;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 
 public class NetworkIO {
 
-    static void sendUdpPacket() {
-
-        // TODO:
-        // send LSL-Package instead
+    public static void sendUdpPacket() {
 
         Thread thread = new Thread((new Runnable() {
             @Override
@@ -23,11 +17,7 @@ public class NetworkIO {
                     byte[] buffer = "1".getBytes();
                     DatagramPacket dp = new DatagramPacket(buffer, 0, buffer.length, InetAddress.getLocalHost(), 40007);
                     ds.send(dp);
-                } catch (SocketException e) {
-                    System.out.println("Send failed. " + e.toString());
-                } catch (UnknownHostException e) {
-                    System.out.println("Send failed. " + e.toString());
-                } catch (IOException e) {
+                } catch (Exception e) {
                     System.out.println("Send failed. " + e.toString());
                 }
             }
