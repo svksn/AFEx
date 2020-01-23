@@ -1,12 +1,14 @@
 package de.jade_hs.afe.AcousticFeatureExtraction;
 
-import android.util.Log;
-
 import java.util.HashMap;
+
+import de.jade_hs.afe.Tools.LslIO;
 
 public class StageProcOnsetDetection extends Stage {
 
     final static String LOG = "StageProcOnsetDetection";
+
+    private LslIO lsl;
 
     private double T;
 
@@ -44,6 +46,7 @@ public class StageProcOnsetDetection extends Stage {
     public StageProcOnsetDetection(HashMap parameter) {
         super(parameter);
 
+        lsl = new LslIO();
 
         T = 1.0f / samplingrate;
         alpha = 0.1f / samplingrate;
@@ -107,6 +110,11 @@ public class StageProcOnsetDetection extends Stage {
         }
 
         float data = onsetDetection(block_left, block_right);
+
+        if (data == 1) {
+            lsl.LslSend();
+        }
+
         float[][] dataOut = new float[1][1];
         dataOut[0][0] = data;
         send(dataOut);
