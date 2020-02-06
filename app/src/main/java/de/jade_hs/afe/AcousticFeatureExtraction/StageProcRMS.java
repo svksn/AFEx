@@ -3,7 +3,7 @@ package de.jade_hs.afe.AcousticFeatureExtraction;
 import java.util.HashMap;
 
 /**
- * Feature extraction: RMS
+ * Feature extraction: Onset Detection
  */
 
 public class StageProcRMS extends Stage {
