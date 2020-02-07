@@ -1,20 +1,29 @@
 package de.jade_hs.afe.Tools;
 
+import java.io.ByteArrayOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 
 public class NetworkIO {
 
-    public static void sendUdpPacket() {
+    public static void sendUdpPacket(final String timestamp, final float[] data) {
 
         Thread thread = new Thread((new Runnable() {
             @Override
             public void run() {
                 try {
-                    System.out.println("Localhost: " + InetAddress.getLocalHost());
+                    // prepare data
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    out.write(timestamp.getBytes());
+                    out.write("_".getBytes());
+                    out.write(floatToBytes(data));
+                    byte[] buffer = out.toByteArray();
+
+                    //System.out.println("Data: " + buffer.length+ " | " + buffer.toString());
+                    //System.out.println("Localhost: " + InetAddress.getLocalHost());
                     DatagramSocket ds = new DatagramSocket();
-                    byte[] buffer = "1".getBytes();
                     DatagramPacket dp = new DatagramPacket(buffer, 0, buffer.length, InetAddress.getLocalHost(), 40007);
                     ds.send(dp);
                 } catch (Exception e) {
@@ -26,5 +35,16 @@ public class NetworkIO {
         thread.start();
 
     }
+
+    public static byte[] floatToBytes(float[] data) {
+
+        ByteBuffer buffer = ByteBuffer.allocate(data.length * 4);
+
+        for (float value : data)
+            buffer.putFloat(value);
+
+        return buffer.array();
+    }
+
 
 }
