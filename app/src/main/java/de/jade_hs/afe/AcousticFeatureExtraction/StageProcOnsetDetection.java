@@ -62,8 +62,8 @@ public class StageProcOnsetDetection extends Stage {
         bandSplit_MulIn = 1.0f / (1.0f + 2.0f * bandSplit_R * bandSplit_G + bandSplit_G * bandSplit_G);
 
         // [lp, bp, hp, wb][L, R]
-        energyRatio_Tau_Fast_ms = new float[] {1.0f, 1.0f, 1.0f, 1.0f};
-        energyRatio_Tau_Slow_ms = new float[] {20.0f, 20.0f, 20.0f, 20.0f};
+        energyRatio_Tau_Fast_ms = new float[] {4.0f, 2.0f, 2.0f, 2.0f}; //1.0f, 1.0f, 1.0f, 1.0f
+        energyRatio_Tau_Slow_ms = new float[] {160.0f, 20.0f, 10.0f, 5.0f}; //80.0f, 40.0f, 20.0f, 5.0f
         energyRatio_State_Fast = new float[4][2];
         energyRatio_State_Slow = new float[4][2];
         energyRatio_Alpha_Fast = new float[] {
@@ -87,14 +87,13 @@ public class StageProcOnsetDetection extends Stage {
                 (float) (- Math.exp(-1.0f / (this.energyRatio_Tau_Slow_ms[2] * 0.001 * samplingrate))),
                 (float) (- Math.exp(-1.0f / (this.energyRatio_Tau_Slow_ms[2] * 0.001 * samplingrate)))};
         // [LP, BP, HP, WB]
-        detectOnsets_ThreshBase = new float[] {8.0f, 8.0f, 8.0f, 8.0f};
-        detectOnsets_ThreshRaise = new float[] {0.0f, 0.0f, 0.0f, 0.0f};
-        detectOnsets_Param1 = new float[] {4.0f, 4.0f, 4.0f, 4.0f};
-        detectOnsets_Decay = new float[] {(float) Math.pow(8192.0f, (-1.0f / samplingrate)),
-                (float) Math.pow(8192.0f, (-1.0f / samplingrate)),
-                (float) Math.pow(8192.0f, (-1.0f / samplingrate)),
-                (float) Math.pow(8192.0f, (-1.0f / samplingrate))};
-
+        detectOnsets_ThreshBase = new float[] {8.0f, 4.0f, 4.0f, 16.0f}; //8.0f, 8.0f, 8.0f, 8.0f
+        detectOnsets_ThreshRaise = new float[] {0.0f, 0.0f, 0.0f, 0.0f}; //0.0f, 0.0f, 0.0f, 0.0f
+        detectOnsets_Param1 = new float[] {8.0f, 4.0f, 6.0f, 32.0f}; //4.0f, 4.0f, 4.0f, 4.0f
+        detectOnsets_Decay = new float[] {(float) Math.pow(2000.0f, (-1.0f / samplingrate)),
+                (float) Math.pow(8000.0f, (-1.0f / samplingrate)),
+                (float) Math.pow(100.0f, (-1.0f / samplingrate)),
+                (float) Math.pow(100.0f, (-1.0f / samplingrate))}; // 8192, 8192, 8192, 8192
 
     }
 
