@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import de.jade_hs.afe.Tools.AudioFileIO;
+import de.jade_hs.afe.Tools.NetworkIO;
 
 /**
  * Write feature data to disk
@@ -47,6 +48,7 @@ public class StageFeatureWrite extends Stage {
     private String timestamp;
     private String feature;
 
+    private int isUdp;
     private int nFeatures;
     private int blockCount;
     private int bufferSize;
@@ -66,6 +68,12 @@ public class StageFeatureWrite extends Stage {
         super(parameter);
 
         feature = (String) parameter.get("prefix");
+
+        if (parameter.get("udp") == null)
+            isUdp = 0;
+        else
+            isUdp = Integer.parseInt((String) parameter.get("udp"));
+
     }
 
     @Override
@@ -175,6 +183,7 @@ public class StageFeatureWrite extends Stage {
         if (bufferSize == 0) {
             nFeatures = 2; // timestamps
             for (float[] aData : data) {
+                Log.d(LOG, "LENGTH: " + aData.length);
                 nFeatures += aData.length;
             }
             bufferSize = nFeatures * 4; // 4 bytes to a float
@@ -184,6 +193,13 @@ public class StageFeatureWrite extends Stage {
         FloatBuffer fbuffer = bbuffer.asFloatBuffer();
 
         fbuffer.put(relTimestamp);
+
+        // send UDP packets. Only passes the first array!
+        if (isUdp == 1) {
+            NetworkIO.sendUdpPacket(
+                    timeFormat.format(currentTime.plusMillis((long) relTimestamp[0]*1000)).substring(9),
+                    data[0]);
+        }
 
         for (float[] aData : data) {
             fbuffer.put(aData);
