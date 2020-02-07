@@ -9,15 +9,15 @@ public class LslIO {
     LSL.StreamInfo info;
     LSL.StreamOutlet outlet;
 
-    public LslIO() {
+    public LslIO(int samplerate, int blocksize) {
 
         info = new LSL.StreamInfo(
-                "MyMarkers",
+                "AFEMarkers",
                 "Markers",
                 1,
-                LSL.IRREGULAR_RATE,
-                LSL.ChannelFormat.string,
-                "AFEx42");
+                samplerate / blocksize,
+                LSL.ChannelFormat.float32,
+                "AFEx");
 
         try {
             outlet = new LSL.StreamOutlet(info);
@@ -27,9 +27,11 @@ public class LslIO {
 
     }
 
-    public void LslSend() {
+    public void LslSend(float data) {
 
-        String[] sample = {"Boink!"};
+        float[] sample = new float[1];
+        sample[0] = data;
+
         try {
             outlet.push_sample(sample);
         } catch(Exception e)  {

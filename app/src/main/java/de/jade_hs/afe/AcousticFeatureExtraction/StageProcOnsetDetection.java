@@ -46,7 +46,7 @@ public class StageProcOnsetDetection extends Stage {
     public StageProcOnsetDetection(HashMap parameter) {
         super(parameter);
 
-        lsl = new LslIO();
+        lsl = new LslIO(samplingrate, blockSize);
 
         T = 1.0f / samplingrate;
         alpha = 0.1f / samplingrate;
@@ -111,9 +111,7 @@ public class StageProcOnsetDetection extends Stage {
 
         float data = onsetDetection(block_left, block_right);
 
-        if (data == 1) {
-            lsl.LslSend();
-        }
+        lsl.LslSend(data);
 
         float[][] dataOut = new float[1][1];
         dataOut[0][0] = data;
