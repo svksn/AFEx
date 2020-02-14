@@ -8,7 +8,7 @@ import java.nio.ByteBuffer;
 
 public class NetworkIO {
 
-    public static void sendUdpPacket(final String timestamp, final float[] data) {
+    public static void sendUdpPacket(final String timestamp) {
 
         Thread thread = new Thread((new Runnable() {
             @Override
@@ -17,8 +17,9 @@ public class NetworkIO {
                     // prepare data
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     out.write(timestamp.getBytes());
-                    out.write("_".getBytes());
-                    out.write(floatToBytes(data));
+                    //out.write("_".getBytes());
+                    //out.write(data.getBytes());
+                    //out.write(floatToBytes(data));
                     byte[] buffer = out.toByteArray();
 
                     //System.out.println("Data: " + buffer.length+ " | " + buffer.toString());

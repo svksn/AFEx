@@ -17,6 +17,7 @@ import java.util.Locale;
 
 import de.jade_hs.afe.Tools.AudioFileIO;
 import de.jade_hs.afe.Tools.NetworkIO;
+import de.jade_hs.afe.Tools.SingleMediaScanner;
 
 /**
  * Write feature data to disk
@@ -60,6 +61,11 @@ public class StageFeatureWrite extends Stage {
 
     DateTimeFormatter timeFormat =
             DateTimeFormatter.ofPattern("uuuuMMdd_HHmmssSSS")
+                    .withLocale(Locale.getDefault())
+                    .withZone(ZoneId.systemDefault());
+
+    DateTimeFormatter timeFormatUdp =
+            DateTimeFormatter.ofPattern("HHmmssSSS")
                     .withLocale(Locale.getDefault())
                     .withZone(ZoneId.systemDefault());
 
@@ -183,7 +189,7 @@ public class StageFeatureWrite extends Stage {
         if (bufferSize == 0) {
             nFeatures = 2; // timestamps
             for (float[] aData : data) {
-                Log.d(LOG, "LENGTH: " + aData.length);
+                //Log.d(LOG, "LENGTH: " + aData.length);
                 nFeatures += aData.length;
             }
             bufferSize = nFeatures * 4; // 4 bytes to a float
@@ -195,10 +201,8 @@ public class StageFeatureWrite extends Stage {
         fbuffer.put(relTimestamp);
 
         // send UDP packets. Only passes the first array!
-        if (isUdp == 1) {
-            NetworkIO.sendUdpPacket(
-                    timeFormat.format(currentTime.plusMillis((long) relTimestamp[0]*1000)).substring(9),
-                    data[0]);
+        if ((isUdp == 1) && (data[0][0] == 1)) {
+            NetworkIO.sendUdpPacket(timeFormatUdp.format(currentTime.plusMillis((long) (relTimestamp[0] * 1000))));
         }
 
         for (float[] aData : data) {
