@@ -2,6 +2,7 @@ package de.jade_hs.afe.AcousticFeatureExtraction;
 
 import org.jtransforms.fft.FloatFFT_1D;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -44,6 +45,7 @@ public class StageProcPSD extends Stage {
 
         CPSD() {
             nfft = nextpow2(blockSize);
+            System.out.println("----------------> NFFT: " + nfft);
             window = hann(blockSize, nfft);
             fft = new FloatFFT_1D(nfft);
             alpha = (float) Math.exp(-(blockSize - hopSize) / (samplingrate * 0.125));
@@ -52,7 +54,8 @@ public class StageProcPSD extends Stage {
 
         void calculate(float[][] input) {
 
-            data = dataConj = new float[channels][nfft * 2];
+            data = new float[channels][nfft * 2];
+            dataConj = new float[channels][];
             P = Ptemp = new float[3][nfft * 2];
 
             for (int iChannel = 0; iChannel < data.length; iChannel++) {
@@ -66,8 +69,9 @@ public class StageProcPSD extends Stage {
                 fft.realForwardFull(data[iChannel]);
 
                 // complex conjugate
+                dataConj[iChannel] = Arrays.copyOf(data[iChannel], data[iChannel].length);
                 for (int iSample = 3; iSample < samples; iSample += 2) {
-                    dataConj[iChannel][iSample] = data[iChannel][iSample];
+                    dataConj[iChannel][iSample] = -data[iChannel][iSample];
                 }
             }
 
@@ -98,27 +102,24 @@ public class StageProcPSD extends Stage {
             if (block >= 10) {
 
                 float[][] dataOut = new float[3][];
-                dataOut[0] = new float[nfft]; // complex spectrum (cross-correlation)
+                dataOut[0] = new float[nfft + 2]; // complex spectrum (cross-correlation)
                 dataOut[1] = new float[nfft / 2 + 1]; // real spectrum (auto-correlation)
                 dataOut[2] = new float[nfft / 2 + 1]; // real spectrum (auto-correlation)
 
                 // copy one-sided spectrum for cross-correlation and scale
-                System.arraycopy(P[0], 0, dataOut[0], 0, nfft);
-                dataOut[0][0] = P[0][0] / samplingrate;
-                dataOut[0][1] = P[0][1] / samplingrate;
-                dataOut[0][nfft - 2] = P[0][nfft - 2] / samplingrate;
-                dataOut[0][nfft - 1] = P[0][nfft - 1] / samplingrate;
-                for (int i = 2; i < nfft - 2; i++) {
-                    dataOut[0][i] = P[0][2 * i] / 2 * samplingrate;
+                dataOut[0][0]    = P[0][0] / samplingrate; // 0 Hz
+                dataOut[0][nfft] = P[0][nfft] / samplingrate; // fs/2
+                for (int i = 2; i < nfft; i++) {
+                    dataOut[0][i] = P[0][i] / (2 * samplingrate);
                 }
 
 
                 // copy one sided spectrum for auto correlation, scale, omit imaginary parts
                 for (int k = 1; k < 3; k++) {
                     dataOut[k][0] = P[k][0] / samplingrate;
-                    dataOut[k][nfft / 2] = P[k][nfft] / samplingrate;
-                    for (int i = 1; i < nfft / 2; i++) {
-                        dataOut[k][i] = P[k][2 * i] / 2 * samplingrate;
+                    dataOut[k][nfft / 2] = P[k][nfft-1] / samplingrate;
+                    for (int i = 1; i < nfft / 2 - 1; i++) {
+                        dataOut[k][i] = P[k][2 * i] / (2 * samplingrate);
                     }
                 }
 
