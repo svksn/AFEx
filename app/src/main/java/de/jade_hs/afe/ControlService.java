@@ -22,7 +22,7 @@ public class ControlService extends Service {
 
     public final IBinder binder  = new LocalBinder();
 
-    StageManager stageManager = new StageManager();
+    StageManager stageManager = new StageManager(this);
 
     /**
      * Binder returns enclosing ControlService instance

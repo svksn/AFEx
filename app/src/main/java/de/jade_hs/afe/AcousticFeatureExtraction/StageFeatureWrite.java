@@ -41,6 +41,7 @@ public class StageFeatureWrite extends Stage {
 
     private static final String EXTENSION = ".feat";
 
+    private File featureFile = null;
     private RandomAccessFile featureRAF = null;
 
     private Instant startTime;
@@ -145,9 +146,9 @@ public class StageFeatureWrite extends Stage {
 
         try {
 
-            featureRAF = new RandomAccessFile(new File(directory +
-                    "/" + feature + "_" + timestamp + EXTENSION),
-                    "rw");
+            featureFile = new File(directory +
+                    "/" + feature + "_" + timestamp + EXTENSION);
+            featureRAF = new RandomAccessFile(featureFile, "rw");
 
             // write header
             featureRAF.writeInt(0);               // block count, written on close
@@ -231,6 +232,7 @@ public class StageFeatureWrite extends Stage {
             featureRAF.writeInt(nFeatures);  // features + timestamps per block
             featureRAF.close();
             featureRAF = null;
+            new SingleMediaScanner(context, featureFile);
         } catch (IOException e) {
             e.printStackTrace();
         }

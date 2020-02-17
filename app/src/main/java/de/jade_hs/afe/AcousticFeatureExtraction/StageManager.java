@@ -1,5 +1,6 @@
 package de.jade_hs.afe.AcousticFeatureExtraction;
 
+import android.content.Context;
 import android.os.Environment;
 
 import org.threeten.bp.Instant;
@@ -19,12 +20,13 @@ public class StageManager {
     Stage mainStage;
     public boolean isRunning = false;
 
-    public StageManager() {
+    public StageManager(Context context) {
 
         //android.os.Debug.waitForDebugger();
 
         Stage.samplingrate = 16000;
         Stage.channels = 2;
+        Stage.context = context;
 
         // build processing tree
         // TODO: properly get path, see FileIO and AudioFileIO.

@@ -1,5 +1,6 @@
 package de.jade_hs.afe.AcousticFeatureExtraction;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.threeten.bp.Instant;
@@ -20,6 +21,8 @@ import java.util.concurrent.TimeUnit;
 abstract class Stage extends TreeSet {
 
     final static String LOG = "Stage";
+
+    static Context context;
 
     final int timeout = 1000; // in ms, wait this long to receive data before stopping a stage.
 
