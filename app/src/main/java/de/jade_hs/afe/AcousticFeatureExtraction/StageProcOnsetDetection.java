@@ -41,6 +41,11 @@ public class StageProcOnsetDetection extends Stage {
     private float rms_rec;
     private float alpha;
 
+    private int iSampleCounter;
+    private double nThreshold;
+    private double nRegressionTime;
+    private int nRegressionTimeSamples;
+
     public StageProcOnsetDetection(HashMap parameter) {
         super(parameter);
 
@@ -92,6 +97,10 @@ public class StageProcOnsetDetection extends Stage {
                 (float) Math.pow(100.0f, (-1.0f / samplingrate)),
                 (float) Math.pow(100.0f, (-1.0f / samplingrate))}; // 8192, 8192, 8192, 8192
 
+        this.iSampleCounter = 0;
+        this.nThreshold = 2f;
+        this.nRegressionTime = 0.1;
+        this.nRegressionTimeSamples = (int) (this.nRegressionTime * samplingrate);
 
     }
 
@@ -141,46 +150,50 @@ public class StageProcOnsetDetection extends Stage {
 
         for (int iSample = 0; iSample < blockSize; iSample++) {
 
-            threshold = addElementwise(this.detectOnsets_ThreshBase, this.detectOnsets_ThreshRaise);
+            //threshold = addElementwise(this.detectOnsets_ThreshBase, this.detectOnsets_ThreshRaise);
             flags = new float[4][2];
 
-            if (!onsetFound) {
+            // Might save some time
+            //if (!onsetFound) {
 
-                if (energy_lp_left[iSample] > threshold[0]) {
+                if (energy_lp_left[iSample] > this.nThreshold {//threshold[0]) {
                     flags[0][0] = 1.0f;
                 }
-                if (energy_bp_left[iSample] > threshold[1]) {
+                if (energy_bp_left[iSample] > this.nThreshold {//threshold[1]) {
                     flags[1][0] = 1.0f;
                 }
-                if (energy_hp_left[iSample] > threshold[2]) {
+                if (energy_hp_left[iSample] > this.nThreshold {//threshold[2]) {
                     flags[2][0] = 1.0f;
                 }
-                if (energy_wb_left[iSample] > threshold[3]) {
+                if (energy_wb_left[iSample] > this.nThreshold {//threshold[3]) {
                     flags[3][0] = 1.0f;
                 }
-                if (energy_lp_right[iSample] > threshold[0]) {
+                if (energy_lp_right[iSample] > this.nThreshold {//threshold[0]) {
                     flags[0][1] = 1.0f;
                 }
-                if (energy_bp_right[iSample] > threshold[1]) {
+                if (energy_bp_right[iSample] > this.nThreshold {//threshold[1]) {
                     flags[1][1] = 1.0f;
                 }
-                if (energy_hp_right[iSample] > threshold[2]) {
+                if (energy_hp_right[iSample] > this.nThreshold {//threshold[2]) {
                     flags[2][1] = 1.0f;
                 }
-                if (energy_wb_right[iSample] > threshold[3]) {
+                if (energy_wb_right[iSample] > this.nThreshold {//threshold[3]) {
                     flags[3][1] = 1.0f;
                 }
 
                 // If more than one band has registered a peak then return 1, else 0
                 if ((flags[0][0] + flags[1][0] + flags[2][0] + flags[3][0] +
-                        flags[0][1] + flags[1][1] + flags[2][1] + flags[3][1]) > 1.0f) {
+                        flags[0][1] + flags[1][1] + flags[2][1] + flags[3][1]) > this.nThreshold && this.iSampleCounter > this.RegressionTimeSamples){//1.0f) {
                     flag = 1.0f;
                     onsetFound = true;
-                    this.detectOnsets_ThreshRaise = multiplyElementwise(
-                            detectOnsets_Param1, threshold);
+                    this.iSampleCounter = 0;
+                    //this.detectOnsets_ThreshRaise = multiplyElementwise(
+                    //        detectOnsets_Param1, threshold);
                 }
-            }
-            multiplyWithArray(detectOnsets_ThreshRaise, detectOnsets_Decay);
+
+            //}
+            this.iSampleCounter++;
+            //multiplyWithArray(detectOnsets_ThreshRaise, detectOnsets_Decay);
         }
         return flag;
     }
