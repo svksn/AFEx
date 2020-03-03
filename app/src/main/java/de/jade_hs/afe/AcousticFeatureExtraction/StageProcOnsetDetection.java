@@ -156,34 +156,34 @@ public class StageProcOnsetDetection extends Stage {
             // Might save some time
             //if (!onsetFound) {
 
-                if (energy_lp_left[iSample] > this.nThreshold {//threshold[0]) {
+                if (energy_lp_left[iSample] > this.nThreshold) {//threshold[0]) {
                     flags[0][0] = 1.0f;
                 }
-                if (energy_bp_left[iSample] > this.nThreshold {//threshold[1]) {
+                if (energy_bp_left[iSample] > this.nThreshold) {//threshold[1]) {
                     flags[1][0] = 1.0f;
                 }
-                if (energy_hp_left[iSample] > this.nThreshold {//threshold[2]) {
+                if (energy_hp_left[iSample] > this.nThreshold) {//threshold[2]) {
                     flags[2][0] = 1.0f;
                 }
-                if (energy_wb_left[iSample] > this.nThreshold {//threshold[3]) {
+                if (energy_wb_left[iSample] > this.nThreshold) {//threshold[3]) {
                     flags[3][0] = 1.0f;
                 }
-                if (energy_lp_right[iSample] > this.nThreshold {//threshold[0]) {
+                if (energy_lp_right[iSample] > this.nThreshold) {//threshold[0]) {
                     flags[0][1] = 1.0f;
                 }
-                if (energy_bp_right[iSample] > this.nThreshold {//threshold[1]) {
+                if (energy_bp_right[iSample] > this.nThreshold) {//threshold[1]) {
                     flags[1][1] = 1.0f;
                 }
-                if (energy_hp_right[iSample] > this.nThreshold {//threshold[2]) {
+                if (energy_hp_right[iSample] > this.nThreshold) {//threshold[2]) {
                     flags[2][1] = 1.0f;
                 }
-                if (energy_wb_right[iSample] > this.nThreshold {//threshold[3]) {
+                if (energy_wb_right[iSample] > this.nThreshold) {//threshold[3]) {
                     flags[3][1] = 1.0f;
                 }
 
                 // If more than one band has registered a peak then return 1, else 0
                 if ((flags[0][0] + flags[1][0] + flags[2][0] + flags[3][0] +
-                        flags[0][1] + flags[1][1] + flags[2][1] + flags[3][1]) > this.nThreshold && this.iSampleCounter > this.RegressionTimeSamples){//1.0f) {
+                        flags[0][1] + flags[1][1] + flags[2][1] + flags[3][1]) > this.nThreshold && this.iSampleCounter > this.nRegressionTimeSamples){//1.0f) {
                     flag = 1.0f;
                     onsetFound = true;
                     this.iSampleCounter = 0;
