@@ -1,4 +1,4 @@
-package de.jade_hs.afe;
+package de.jade_hs.afex;
 
 import android.app.ActivityManager;
 import android.content.ComponentName;

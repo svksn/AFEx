@@ -1,4 +1,4 @@
-package de.jade_hs.afe.AcousticFeatureExtraction;
+package de.jade_hs.afex.AcousticFeatureExtraction;
 
 import android.util.Log;
 
@@ -10,8 +10,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 
-import de.jade_hs.afe.Tools.AudioFileIO;
-import de.jade_hs.afe.Tools.Timestamp;
+import de.jade_hs.afex.Tools.AudioFileIO;
 
 /**
  * Write raw audio to disk

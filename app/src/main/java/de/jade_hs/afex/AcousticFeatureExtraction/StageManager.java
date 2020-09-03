@@ -1,4 +1,4 @@
-package de.jade_hs.afe.AcousticFeatureExtraction;
+package de.jade_hs.afex.AcousticFeatureExtraction;
 
 import android.content.Context;
 import android.os.Environment;
@@ -6,10 +6,6 @@ import android.os.Environment;
 import org.threeten.bp.Instant;
 
 import java.io.File;
-import java.util.Date;
-
-import de.jade_hs.afe.R;
-import de.jade_hs.afe.Tools.Timestamp;
 
 /**
  * Sets up and starts stages, i.e. producers, conducers and consumers.

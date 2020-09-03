@@ -1,8 +1,8 @@
-package de.jade_hs.afe.AcousticFeatureExtraction;
+package de.jade_hs.afex.AcousticFeatureExtraction;
 
 import java.util.HashMap;
 
-import de.jade_hs.afe.Processing.Preprocessing.FilterHP;
+import de.jade_hs.afex.Processing.Preprocessing.FilterHP;
 
 /**
  * Audio preprocessing

@@ -1,4 +1,4 @@
-package de.jade_hs.afe.Tools;
+package de.jade_hs.afex.Tools;
 
 import java.io.ByteArrayOutputStream;
 import java.net.DatagramPacket;

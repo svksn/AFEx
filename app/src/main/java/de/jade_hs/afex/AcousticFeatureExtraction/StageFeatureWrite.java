@@ -1,4 +1,4 @@
-package de.jade_hs.afe.AcousticFeatureExtraction;
+package de.jade_hs.afex.AcousticFeatureExtraction;
 
 import android.os.Environment;
 import android.util.Log;
@@ -15,9 +15,9 @@ import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Locale;
 
-import de.jade_hs.afe.Tools.AudioFileIO;
-import de.jade_hs.afe.Tools.NetworkIO;
-import de.jade_hs.afe.Tools.SingleMediaScanner;
+import de.jade_hs.afex.Tools.AudioFileIO;
+import de.jade_hs.afex.Tools.NetworkIO;
+import de.jade_hs.afex.Tools.SingleMediaScanner;
 
 /**
  * Write feature data to disk

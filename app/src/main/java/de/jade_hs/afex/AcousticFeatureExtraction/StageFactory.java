@@ -1,4 +1,4 @@
-package de.jade_hs.afe.AcousticFeatureExtraction;
+package de.jade_hs.afex.AcousticFeatureExtraction;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

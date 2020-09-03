@@ -1,4 +1,4 @@
-package de.jade_hs.afe;
+package de.jade_hs.afex;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -12,7 +12,7 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import de.jade_hs.afe.AcousticFeatureExtraction.StageManager;
+import de.jade_hs.afex.AcousticFeatureExtraction.StageManager;
 
 public class ControlService extends Service {
 

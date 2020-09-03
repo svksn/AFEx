@@ -4,7 +4,7 @@
  *
  */
 
-package de.jade_hs.afe.Processing.Preprocessing;
+package de.jade_hs.afex.Processing.Preprocessing;
 
 public class CResampling {
 
