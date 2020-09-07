@@ -20,7 +20,7 @@ A current version can be installed manually next to an existing copy, e.g. to ``
 
 https://cmake.org/download/
 
-You may also need Ninja. The binary can be placed into the bin folder of the cmake instalation.
+You may also need Ninja. The binary can be placed into the bin folder of the cmake installation.
 
 https://github.com/ninja-build/ninja
 
