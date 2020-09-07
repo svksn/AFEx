@@ -6,7 +6,7 @@ Audio Feature Extraction Framework for Android
 ### LabStreamingLayer
 External libraries are required for LabStreamingLayer:
 
-https://github.com/sccn/liblsl.git
+https://github.com/sccn/liblsl.git  
 https://github.com/labstreaminglayer/liblsl-Java.git
 
 See/set the path of liblsl-java in ```settings.gradle```. liblsl should be on the same directory level. 
