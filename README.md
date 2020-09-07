@@ -24,7 +24,7 @@ You may also need Ninja. The binary can be placed into the bin folder of the cma
 
 https://github.com/ninja-build/ninja
 
-The new cmake path can be set in ```local.properties``` (see ```build.grade``` of the liblsl-java module).
+The new cmake path can be set in ```local.properties``` (see ```build.gradle``` of the liblsl-java module).
 
 #### Linux & Co. 
 The cmake version supplied by the distribution's repositories should be recent enough and can be installed using the package manager. 
