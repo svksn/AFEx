@@ -110,7 +110,8 @@ public class StageProcOnsetDetection extends Stage {
 
         float data = onsetDetection(block_left, block_right);
 
-        lsl.LslSend(data);
+        if (data == 1)
+            lsl.LslSend("onset");
 
         float[][] dataOut = new float[1][1];
         dataOut[0][0] = data;
