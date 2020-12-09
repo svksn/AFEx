@@ -16,7 +16,7 @@ public class LslIO {
                 "Markers",
                 1,
                 samplerate / blocksize,
-                LSL.ChannelFormat.float32,
+                LSL.ChannelFormat.string,
                 "AFEx");
 
         try {
@@ -27,9 +27,9 @@ public class LslIO {
 
     }
 
-    public void LslSend(float data) {
+    public void LslSend(String data) {
 
-        float[] sample = new float[1];
+        String[] sample = new String[1];
         sample[0] = data;
 
         try {
