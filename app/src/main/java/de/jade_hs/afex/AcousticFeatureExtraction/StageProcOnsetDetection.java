@@ -1,14 +1,22 @@
 package de.jade_hs.afex.AcousticFeatureExtraction;
 
+import android.util.Log;
+
+import java.io.IOException;
 import java.util.HashMap;
 
-import de.jade_hs.afex.Tools.LslIO;
+import edu.ucsd.sccn.LSL;
 
 public class StageProcOnsetDetection extends Stage {
 
     final static String LOG = "StageProcOnsetDetection";
 
-    private LslIO lsl;
+    private LSL.StreamInfo info;
+    private LSL.StreamOutlet outlet;
+    private int isLsl;
+    private int fsLsl;
+    private String[] lslSample = new String[]{"onset"};
+
 
     private double T;
 
@@ -46,7 +54,36 @@ public class StageProcOnsetDetection extends Stage {
     public StageProcOnsetDetection(HashMap parameter) {
         super(parameter);
 
-        lsl = new LslIO(samplingrate, blockSize);
+        if (parameter.get("lsl") == null)
+            isLsl = 0;
+        else
+            isLsl = Integer.parseInt((String) parameter.get("lsl"));
+
+        if (isLsl == 1) {
+
+            if (parameter.get("lsl_rate") == null)
+                fsLsl = 250;
+            else
+                fsLsl = Integer.parseInt((String) parameter.get("lsl"));
+
+            Log.d(LOG, "----------> " + id + ": LSL enabled (rate: " + fsLsl +" Hz)");
+
+            info = new LSL.StreamInfo(
+                    "AFEx",
+                    "audio_onset",
+                    1,
+                    fsLsl,
+                    LSL.ChannelFormat.int8,
+                    "AFEx");
+
+            try {
+                outlet = new LSL.StreamOutlet(info);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d(LOG, "----------> " + id + ": LSL disabled");
+        }
 
         T = 1.0f / samplingrate;
         alpha = 0.1f / samplingrate;
@@ -110,8 +147,8 @@ public class StageProcOnsetDetection extends Stage {
 
         float data = onsetDetection(block_left, block_right);
 
-        if (data == 1)
-            lsl.LslSend("onset");
+        if (isLsl == 1)
+            outlet.push_sample(new short[]{(short) data});
 
         float[][] dataOut = new float[1][1];
         dataOut[0][0] = data;
