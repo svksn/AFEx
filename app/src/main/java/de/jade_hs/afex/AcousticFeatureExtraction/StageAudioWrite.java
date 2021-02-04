@@ -12,7 +12,6 @@ import java.util.Locale;
 
 import de.jade_hs.afex.Tools.AudioFileIO;
 
-import de.jade_hs.afex.Tools.LslIO;
 import edu.ucsd.sccn.LSL;
 
 /**
@@ -23,7 +22,6 @@ public class StageAudioWrite extends Stage {
 
     final static String LOG = "StageConsumer";
 
-    private LslIO lsl;
     private LSL.StreamInfo info;
     private LSL.StreamOutlet outlet;
 
