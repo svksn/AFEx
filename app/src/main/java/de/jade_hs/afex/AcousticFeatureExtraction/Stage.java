@@ -99,6 +99,7 @@ abstract class Stage extends TreeSet {
 
     void stop() {
         thread.interrupt();
+        cleanup();
     }
 
 
