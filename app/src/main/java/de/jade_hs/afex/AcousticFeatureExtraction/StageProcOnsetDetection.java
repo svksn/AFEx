@@ -135,6 +135,13 @@ public class StageProcOnsetDetection extends Stage {
     }
 
     @Override
+    protected void cleanup() {
+        outlet.close();
+        info.destroy();
+        Log.d(LOG, "Stopped " + LOG);
+    }
+
+    @Override
     protected void process(float[][] buffer) {
 
         float[] block_left = new float[blockSize];
