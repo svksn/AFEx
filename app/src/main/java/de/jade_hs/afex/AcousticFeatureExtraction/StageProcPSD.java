@@ -1,9 +1,16 @@
 package de.jade_hs.afex.AcousticFeatureExtraction;
 
+import android.util.Log;
+
 import org.jtransforms.fft.FloatFFT_1D;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
+
+import edu.ucsd.sccn.LSL;
 
 /**
  * Feature extraction: Auto- and cross correlation
@@ -23,11 +30,54 @@ public class StageProcPSD extends Stage {
 
     CPSD cpsd;
 
+    private LSL.StreamInfo info;
+    private LSL.StreamOutlet outlet;
+    private int isLsl;
+    private int fsLsl;
+
     public StageProcPSD(HashMap parameter) {
         super(parameter);
         cpsd = new CPSD();
+
+        if (parameter.get("lsl") == null)
+            isLsl = 0;
+        else
+            isLsl = Integer.parseInt((String) parameter.get("lsl"));
+
+        if (isLsl == 1) {
+
+            if (parameter.get("lsl_rate") == null)
+                fsLsl = 250;
+            else
+                fsLsl = Integer.parseInt((String) parameter.get("lsl"));
+
+            Log.d(LOG, "----------> " + id + ": LSL enabled (rate: " + fsLsl +" Hz)");
+
+            info = new LSL.StreamInfo(
+                    "AFEx",
+                    "psd",
+                    2 * cpsd.nfft + 2,
+                    fsLsl,
+                    LSL.ChannelFormat.float32,
+                    "AFEx");
+
+            try {
+                outlet = new LSL.StreamOutlet(info);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d(LOG, "----------> " + id + ": LSL disabled");
+        }
+
     }
 
+    @Override
+    protected void cleanup() {
+        outlet.close();
+        info.destroy();
+        Log.d(LOG, "Stopped " + LOG);
+    }
 
     @Override
     protected void process(float[][] buffer) {
@@ -121,6 +171,19 @@ public class StageProcPSD extends Stage {
                     for (int i = 1; i < nfft / 2 - 1; i++) {
                         dataOut[k][i] = P[k][2 * i] / (2 * samplingrate);
                     }
+                }
+
+                if (isLsl == 1) {
+
+                    int bufferSize = 2*(nfft+2);
+                    ByteBuffer bbuffer = ByteBuffer.allocate(bufferSize);
+                    FloatBuffer fbuffer = bbuffer.asFloatBuffer();
+
+                    for (float[] data : dataOut) {
+                        fbuffer.put(data);
+                    }
+
+                    outlet.push_sample(fbuffer.array());
                 }
 
                 send(dataOut);
