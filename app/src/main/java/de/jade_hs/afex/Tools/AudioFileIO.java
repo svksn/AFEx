@@ -17,11 +17,12 @@ public class AudioFileIO {
 
     protected static final String LOG = "IOClass";
 
-    public static final String MAIN_FOLDER = "AFE";
+    public static final String MAIN_FOLDER = "AFEx";
     public static final String CACHE_FOLDER = MAIN_FOLDER + File.separator + "cache";
     public static final String FEATURE_FOLDER = MAIN_FOLDER + File.separator + "features";
     public static final String CACHE_WAVE = "wav";
     public static final String CACHE_RAW = "raw";
+    public static final String STAGE_CONFIG = "features.xml";
 
     public String filename;
 
@@ -37,8 +38,17 @@ public class AudioFileIO {
         this.filename = filename;
     }
 
-    // create main folder
-    public String getFolderPath() {
+    // main folder
+    public static String getMainPath() {
+        File directory = Environment.getExternalStoragePublicDirectory(MAIN_FOLDER);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+        return directory.getAbsolutePath();
+    }
+
+    // cache folder
+    public String getCachePath() {
         File baseDirectory = Environment.getExternalStoragePublicDirectory(CACHE_FOLDER);
         if (!baseDirectory.exists()) {
             baseDirectory.mkdir();
@@ -56,7 +66,7 @@ public class AudioFileIO {
         }
 
         String filename = new StringBuilder()
-                .append(getFolderPath())
+                .append(getCachePath())
                 .append(File.separator)
                 .append(tmp)
                 .append(".")

@@ -7,6 +7,8 @@ import org.threeten.bp.Instant;
 
 import java.io.File;
 
+import de.jade_hs.afex.Tools.AudioFileIO;
+
 /**
  * Sets up and starts stages, i.e. producers, conducers and consumers.
  */
@@ -25,9 +27,7 @@ public class StageManager {
         Stage.context = context;
 
         // build processing tree
-        // TODO: properly get path, see FileIO and AudioFileIO.
-        File features = new File(Environment.getExternalStoragePublicDirectory("/AFE")
-                + "/features.xml");
+        File features = new File(Environment.getExternalStoragePublicDirectory(AudioFileIO.MAIN_FOLDER) + File.separator + AudioFileIO.STAGE_CONFIG);
 
         mainStage = new StageFactory().parseConfig(features);
 
