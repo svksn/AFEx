@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,6 +15,14 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import de.jade_hs.afex.Tools.AudioFileIO;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         AndroidThreeTen.init(this);
+
+        // check if configuration is present (1st start),
+        // create one if necessary
+        defaultConfiguration();
 
         setupUI();
     }
@@ -73,6 +86,37 @@ public class MainActivity extends AppCompatActivity {
             updateUI();
             }
         });
+    }
+
+    protected void defaultConfiguration() {
+
+        File file = new File(AudioFileIO.getMainPath() + File.separator + AudioFileIO.STAGE_CONFIG);
+
+        if (!file.exists()) {
+
+            InputStream in = getResources().openRawResource(R.raw.features);
+            FileOutputStream out = null;
+
+            try {
+
+                out = new FileOutputStream(file);
+
+                byte[] data = new byte[1024];
+                int read = 0;
+                System.out.print("---------> CONFIG");
+                while ((read = in.read(data)) > 0) {
+                    System.out.print("---------> CONFIG");
+                    System.out.print(data);
+                    out.write(data, 0, read);
+                }
+
+                in.close();
+                out.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     protected void updateUI() {
