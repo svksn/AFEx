@@ -136,8 +136,10 @@ public class StageProcOnsetDetection extends Stage {
 
     @Override
     protected void cleanup() {
-        outlet.close();
-        info.destroy();
+        //if (isLsl == 1) {
+        //    outlet.close();
+        //    info.destroy();
+        //}
         Log.d(LOG, "Stopped " + LOG);
     }
 
