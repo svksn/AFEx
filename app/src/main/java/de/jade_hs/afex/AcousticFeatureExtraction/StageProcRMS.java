@@ -31,7 +31,7 @@ public class StageProcRMS extends Stage {
         if (isLsl == 1) {
 
             if (parameter.get("lsl_rate") == null)
-                fsLsl = 40;
+                fsLsl = 80;
             else
                 fsLsl = Integer.parseInt((String) parameter.get("lsl"));
 
@@ -40,7 +40,7 @@ public class StageProcRMS extends Stage {
             info = new LSL.StreamInfo(
                     "AFEx",
                     "rms",
-                    2,
+                    channels,
                     fsLsl,
                     LSL.ChannelFormat.float32,
                     "AFEx");
