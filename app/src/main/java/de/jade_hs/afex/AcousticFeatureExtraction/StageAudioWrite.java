@@ -105,8 +105,8 @@ public class StageAudioWrite extends Stage {
         io.closeDataOutStream();
 
         if (isLsl == 1) {
-            outlet.close();
-            info.destroy();
+            //outlet.close();
+            //info.destroy();
         }
 
         Log.d(LOG, id + ": Stopped consuming");
@@ -133,7 +133,6 @@ public class StageAudioWrite extends Stage {
         try {
             stream.write(dataOut);
             if (isLsl == 1) {
-                Log.d(LOG, id + ": push...");
                 outlet.push_sample(dataOut);
             }
         } catch (IOException e) {

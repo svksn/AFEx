@@ -155,6 +155,7 @@ abstract class Stage extends TreeSet {
             }
         }
 
+        cleanup();
         Log.d(LOG, id + ": Stopped consuming");
 
     }
