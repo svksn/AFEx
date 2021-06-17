@@ -58,7 +58,7 @@ public class StageFeatureWrite extends Stage {
     private float hopDuration;
     private float[] relTimestamp = new float[]{0, 0};
 
-    private float featFileSize = 10; // size of feature files in seconds.
+    private float featFileSize = 60; // size of feature files in seconds.
 
     DateTimeFormatter timeFormat =
             DateTimeFormatter.ofPattern("uuuuMMdd_HHmmssSSS")
@@ -175,7 +175,7 @@ public class StageFeatureWrite extends Stage {
 
     protected void appendFeature(float[][] data) {
 
-        //System.out.println("timestamp: " + relTimestamp[1] + " | size: " + featFileSize);
+        Log.d(LOG, "timestamp: " + relTimestamp[1] + " | size: " + featFileSize);
 
         // start a new feature file?
         if (relTimestamp[1] >= featFileSize) {
@@ -210,9 +210,9 @@ public class StageFeatureWrite extends Stage {
             fbuffer.put(aData);
         }
 
-        // round to 3 decimals -> milliseconds.
-        relTimestamp[0] = Math.round((relTimestamp[0] + hopDuration) * 1000.0f) / 1000.0f;
-        relTimestamp[1] = Math.round((relTimestamp[1] + hopDuration) * 1000.0f) / 1000.0f;
+        // round to 5 decimals -> xx.xx milliseconds.
+        relTimestamp[0] = Math.round((relTimestamp[0] + hopDuration) * 100000.0f) / 100000.0f;
+        relTimestamp[1] = Math.round((relTimestamp[1] + hopDuration) * 100000.0f) / 100000.0f;
 
         try {
             featureRAF.getChannel().write(bbuffer);
@@ -226,7 +226,6 @@ public class StageFeatureWrite extends Stage {
 
     private void closeFeatureFile() {
         try {
-
             featureRAF.seek(0);
             featureRAF.writeInt(blockCount); // block count for this feature file
             featureRAF.writeInt(nFeatures);  // features + timestamps per block
