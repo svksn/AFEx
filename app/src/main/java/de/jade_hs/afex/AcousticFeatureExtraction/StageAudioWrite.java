@@ -16,11 +16,16 @@ import edu.ucsd.sccn.LSL;
 
 /**
  * Write raw audio to disk
+ *
+ * To prevent unintentional audio recordings, this feature needs to be enabled specifically by
+ * setting the corresponding flag below, in addition to an entry in features.xml
  */
 
 public class StageAudioWrite extends Stage {
 
     final static String LOG = "StageConsumer";
+
+    final static Boolean ENABLED = false;
 
     private LSL.StreamInfo info;
     private LSL.StreamOutlet outlet;
@@ -38,30 +43,32 @@ public class StageAudioWrite extends Stage {
     public StageAudioWrite(HashMap parameter) {
         super(parameter);
 
-        if (parameter.get("lsl") == null)
-            isLsl = 0;
-        else
-            isLsl = Integer.parseInt((String) parameter.get("lsl"));
+        if (ENABLED) {
+            if (parameter.get("lsl") == null)
+                isLsl = 0;
+            else
+                isLsl = Integer.parseInt((String) parameter.get("lsl"));
 
-        if (isLsl == 1) {
+            if (isLsl == 1) {
 
-            Log.d(LOG, "----------> " + id + ": LSL enabled");
+                Log.d(LOG, "----------> " + id + ": LSL enabled");
 
-            info = new LSL.StreamInfo(
-                    "RawAudio",
-                    "Audio",
-                    channels,
-                    blockSize,
-                    LSL.ChannelFormat.int8,
-                    "AFEx");
+                info = new LSL.StreamInfo(
+                        "RawAudio",
+                        "Audio",
+                        channels,
+                        blockSize,
+                        LSL.ChannelFormat.int8,
+                        "AFEx");
 
-            try {
-                outlet = new LSL.StreamOutlet(info);
-            } catch (IOException e) {
-                e.printStackTrace();
+                try {
+                    outlet = new LSL.StreamOutlet(info);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                Log.d(LOG, "----------> " + id + ": LSL disabled");
             }
-        } else {
-            Log.d(LOG, "----------> " + id + ": LSL disabled");
         }
 
     }
@@ -69,15 +76,17 @@ public class StageAudioWrite extends Stage {
     @Override
     void start() {
 
-        io = new AudioFileIO("cache_" + timeFormat.format(Stage.startTime));
+        if (ENABLED) {
+            io = new AudioFileIO("cache_" + timeFormat.format(Stage.startTime));
 
-        stream = io.openDataOutStream(
-                samplingrate,
-                channels,
-                16,
-                true);
+            stream = io.openDataOutStream(
+                    samplingrate,
+                    channels,
+                    16,
+                    true);
 
-        super.start();
+            super.start();
+        }
     }
 
 
