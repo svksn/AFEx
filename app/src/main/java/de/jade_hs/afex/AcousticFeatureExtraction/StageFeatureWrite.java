@@ -175,8 +175,6 @@ public class StageFeatureWrite extends Stage {
 
     protected void appendFeature(float[][] data) {
 
-        Log.d(LOG, "timestamp: " + relTimestamp[1] + " | size: " + featFileSize);
-
         // start a new feature file?
         if (relTimestamp[1] >= featFileSize) {
             // Update timestamp based on samples processed. This only considers block- and hopsize
