@@ -5,5 +5,4 @@
         <stage feature="StageProcRMS" id="12" blocksize="400" hopsize="200" lsl="1"/>
     </stage>
     <stage feature="StageProcOnsetDetection" id="20" blocksize="32" hopsize="32" lsl="1"/>
-    <stage feature="StageAudioWrite" id="30" blocksize="400" hopsize="400" lsl = "1"/>
 </stage>
