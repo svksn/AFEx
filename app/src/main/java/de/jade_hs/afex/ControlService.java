@@ -24,6 +24,12 @@ public class ControlService extends Service {
 
     StageManager stageManager = new StageManager(this);
 
+    private static Context ctx;
+
+    public static Context getContext() {
+        return ctx;
+    }
+
     /**
      * Binder returns enclosing ControlService instance
      */
@@ -41,6 +47,8 @@ public class ControlService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+
+        ctx = getApplicationContext();
 
         setNotification();
 

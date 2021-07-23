@@ -1,5 +1,7 @@
 package de.jade_hs.afex.Tools;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
@@ -13,13 +15,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import de.jade_hs.afex.ControlService;
+import de.jade_hs.afex.MainActivity;
+
 public class AudioFileIO {
 
     protected static final String LOG = "IOClass";
 
     public static final String MAIN_FOLDER = "AFEx";
-    public static final String CACHE_FOLDER = MAIN_FOLDER + File.separator + "cache";
-    public static final String FEATURE_FOLDER = MAIN_FOLDER + File.separator + "features";
+    public static final String CACHE_FOLDER = getMainPath() + "cache";
+    public static final String FEATURE_FOLDER = getMainPath() + "features";
     public static final String CACHE_WAVE = "wav";
     public static final String CACHE_RAW = "raw";
     public static final String STAGE_CONFIG = "features.xml";
@@ -40,20 +45,30 @@ public class AudioFileIO {
 
     // main folder
     public static String getMainPath() {
-        File directory = Environment.getExternalStoragePublicDirectory(MAIN_FOLDER);
+        final File directory;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Context ctx = MainActivity.getContext();
+            directory = new File(ctx.getExternalFilesDir(null).getAbsolutePath());
+        } else {
+            directory = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+        }
+
         if (!directory.exists()) {
             directory.mkdir();
         }
-        return directory.getAbsolutePath();
+        Log.d(LOG, directory.getAbsolutePath()+ File.separator);
+        return directory.getAbsolutePath() + File.separator;
     }
 
     // cache folder
     public String getCachePath() {
-        File baseDirectory = Environment.getExternalStoragePublicDirectory(CACHE_FOLDER);
-        if (!baseDirectory.exists()) {
-            baseDirectory.mkdir();
+
+        File cacheDirectory = new File(CACHE_FOLDER);
+        if (!cacheDirectory.exists()) {
+            cacheDirectory.mkdir();
         }
-        return baseDirectory.getAbsolutePath();
+        return cacheDirectory.getAbsolutePath();
     }
 
     // build filename

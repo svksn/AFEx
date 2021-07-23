@@ -62,7 +62,7 @@ public class StageProcOnsetDetection extends Stage {
         if (isLsl == 1) {
 
             if (parameter.get("lsl_rate") == null)
-                fsLsl = 250;
+                fsLsl = samplingrate / (blockSize - hopSize);
             else
                 fsLsl = Integer.parseInt((String) parameter.get("lsl"));
 

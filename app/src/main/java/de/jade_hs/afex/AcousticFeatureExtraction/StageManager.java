@@ -27,10 +27,8 @@ public class StageManager {
         Stage.context = context;
 
         // build processing tree
-        File features = new File(Environment.getExternalStoragePublicDirectory(AudioFileIO.MAIN_FOLDER) + File.separator + AudioFileIO.STAGE_CONFIG);
-
+        File features = new File(AudioFileIO.getMainPath() + AudioFileIO.STAGE_CONFIG);
         mainStage = new StageFactory().parseConfig(features);
-
     }
 
     public void start() {

@@ -20,7 +20,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
  *
  * <stage feature="StageAudioCapture" id="00">
  *   <stage feature="StagePreHighpass" id="10" cutoff_hz="250">
- *     <stage feature="StageProcPSD" id="11" blocksize="400" hopsize="200">
+ *     <stage feature="StageProcPSD" id="11" blocksize="400" hopsize="200" blockout="2000" hopout="2000">
  *       <stage feature="StageFeatureWrite" id="110" prefix="PSD" nfeatures="1026"/>
  *     </stage>
  *     <stage feature="StageProcRMS" id="12" blocksize="400" hopsize="200">

@@ -31,7 +31,7 @@ public class StageProcRMS extends Stage {
         if (isLsl == 1) {
 
             if (parameter.get("lsl_rate") == null)
-                fsLsl = 80;
+                fsLsl = samplingrate / (blockSize - hopSize);
             else
                 fsLsl = Integer.parseInt((String) parameter.get("lsl"));
 

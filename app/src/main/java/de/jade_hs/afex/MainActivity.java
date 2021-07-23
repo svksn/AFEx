@@ -5,12 +5,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -21,23 +25,36 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 
 import de.jade_hs.afex.Tools.AudioFileIO;
 
 public class MainActivity extends AppCompatActivity {
+
+    final static String LOG = "Main";
 
     FloatingActionButton fabStart;
     TextView textState;
     ControlService controlService;
     boolean isBound = false;
 
+    private static Context ctx;
+
+    public static Context getContext() {
+        return MainActivity.ctx;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ctx = getApplicationContext();
+
         setContentView(R.layout.activity_main);
 
         AndroidThreeTen.init(this);
+
+        managePermissions();
 
         // check if configuration is present (1st start),
         // create one if necessary
@@ -69,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected void setupUI() {
 
-        textState = (TextView) findViewById(R.id.state);
+        textState = findViewById(R.id.state);
 
         fabStart = findViewById(R.id.fabStart);
         fabStart.setOnClickListener(new View.OnClickListener() {
@@ -90,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
     protected void defaultConfiguration() {
 
-        File file = new File(AudioFileIO.getMainPath() + File.separator + AudioFileIO.STAGE_CONFIG);
+        File file = new File(AudioFileIO.getMainPath() + AudioFileIO.STAGE_CONFIG);
 
         if (!file.exists()) {
 
@@ -119,6 +136,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    protected void managePermissions() {
+
+        PackageInfo info = null;
+        try {
+            info = getPackageManager().getPackageInfo(this.getPackageName(), PackageManager.GET_PERMISSIONS);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        String[] permissions = info.requestedPermissions;
+
+        for (String p : permissions) {
+            Log.d(LOG, p + ": " + ContextCompat.checkSelfPermission(this, p));
+            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {
+
+            }
+        }
+
+
+    }
+
     protected void updateUI() {
 
         if (controlService != null && controlService.isRunning()) {
@@ -141,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection connection = new ServiceConnection() {
+    private final ServiceConnection connection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className,
