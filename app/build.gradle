@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 29
     defaultConfig {
-        applicationId "de.jade_hs.afe"
+        applicationId "de.jade_hs.afex"
         minSdkVersion 24
         targetSdkVersion 27
         versionCode 1
