@@ -56,7 +56,7 @@ public class StageFeatureWrite extends Stage {
     private int bufferSize;
 
     private float hopDuration;
-    private float[] relTimestamp = new float[]{0, 0};
+    private float[] relTimestamp;
 
     private float featFileSize = 10; // size of feature files in seconds.
 
@@ -88,6 +88,8 @@ public class StageFeatureWrite extends Stage {
 
         startTime = Stage.startTime;
         currentTime = startTime;
+        relTimestamp = new float[]{0, 0};
+
         openFeatureFile();
 
         super.start();
@@ -131,7 +133,7 @@ public class StageFeatureWrite extends Stage {
 
     private void openFeatureFile() {
 
-        File directory = Environment.getExternalStoragePublicDirectory(AudioFileIO.FEATURE_FOLDER);
+        File directory = new File(AudioFileIO.FEATURE_FOLDER);
         if (!directory.exists()) {
             directory.mkdir();
         }
