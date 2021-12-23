@@ -122,7 +122,7 @@ public class StageProcPSD extends Stage {
 
                 // complex conjugate
                 dataConj[iChannel] = Arrays.copyOf(data[iChannel], data[iChannel].length);
-                for (int iSample = 3; iSample < samples; iSample += 2) {
+                for (int iSample = 3; iSample < data[iChannel].length; iSample += 2) {
                     dataConj[iChannel][iSample] = -data[iChannel][iSample];
                 }
             }
@@ -130,13 +130,13 @@ public class StageProcPSD extends Stage {
             // correlation
             for (int i = 0; i < 2 * nfft - 1; i += 2) {
                 P[0][i] = data[0][i] * dataConj[1][i] - data[0][i + 1] * dataConj[1][i + 1];
-                P[0][i + 1] = data[0][i] * dataConj[1][i + 1] - data[0][i + 1] * dataConj[1][i];
+                P[0][i + 1] = data[0][i] * dataConj[1][i + 1] + data[0][i + 1] * dataConj[1][i];
 
                 P[1][i] = data[0][i] * dataConj[0][i] - data[0][i + 1] * dataConj[0][i + 1];
-                P[1][i + 1] = data[0][i] * dataConj[0][i + 1] - data[0][i + 1] * dataConj[0][i];
+                P[1][i + 1] = data[0][i] * dataConj[0][i + 1] + data[0][i + 1] * dataConj[0][i];
 
                 P[2][i] = data[1][i] * dataConj[1][i] - data[1][i + 1] * dataConj[1][i + 1];
-                P[2][i + 1] = data[1][i] * dataConj[1][i + 1] - data[1][i + 1] * dataConj[1][i];
+                P[2][i + 1] = data[1][i] * dataConj[1][i + 1] + data[1][i + 1] * dataConj[1][i];
             }
 
 
@@ -169,8 +169,8 @@ public class StageProcPSD extends Stage {
                 // copy one sided spectrum for auto correlation, scale, omit imaginary parts
                 for (int k = 1; k < 3; k++) {
                     dataOut[k][0] = P[k][0] / samplingrate;
-                    dataOut[k][nfft / 2] = P[k][nfft - 1] / samplingrate;
-                    for (int i = 1; i < nfft / 2 - 1; i++) {
+                    dataOut[k][nfft / 2] = P[k][nfft] / samplingrate;
+                    for (int i = 1; i < nfft / 2; i++) {
                         dataOut[k][i] = P[k][2 * i] / (2 * samplingrate);
                     }
                 }

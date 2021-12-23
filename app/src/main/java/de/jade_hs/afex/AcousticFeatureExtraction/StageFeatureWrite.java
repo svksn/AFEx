@@ -55,8 +55,8 @@ public class StageFeatureWrite extends Stage {
     private int blockCount;
     private int bufferSize;
 
-    private float hopDuration;
-    private float[] relTimestamp = new float[]{0, 0};
+    private int hopDuration;
+    private int[] relTimestamp;
 
     private float featFileSize = 60; // size of feature files in seconds.
 
@@ -88,6 +88,7 @@ public class StageFeatureWrite extends Stage {
 
         startTime = Stage.startTime;
         currentTime = startTime;
+        relTimestamp = new int[]{0, 0};
         openFeatureFile();
 
         super.start();
@@ -141,7 +142,7 @@ public class StageFeatureWrite extends Stage {
         }
 
         // add length of last feature file to current time
-        currentTime = currentTime.plusMillis((long) (relTimestamp[1]*1000));
+        currentTime = currentTime.plusMillis((long) ((float)(relTimestamp[0]) / (float)mySamplingRate * 1000.0));
         timestamp = timeFormat.format(currentTime);
 
         try {
@@ -163,9 +164,9 @@ public class StageFeatureWrite extends Stage {
             blockCount = 0;
             relTimestamp[0] = 0;
 
-            hopDuration = (float) inStage.hopSizeOut / samplingrate;
-            relTimestamp[1] = (float) inStage.blockSizeOut / samplingrate;
-
+            hopDuration = inStage.hopSizeOut;
+            relTimestamp[0] = relTimestamp[0] % (int)(featFileSize * samplingrate);
+            relTimestamp[1] = relTimestamp[0] + (inStage.blockSizeOut - 1);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -176,7 +177,7 @@ public class StageFeatureWrite extends Stage {
     protected void appendFeature(float[][] data) {
 
         // start a new feature file?
-        if (relTimestamp[1] >= featFileSize) {
+        if (featureRAF == null || relTimestamp[0] >= featFileSize * samplingrate) {
             // Update timestamp based on samples processed. This only considers block- and hopsize
             // of the previous stage. If another stage uses different hopping, averaging or any
             // other mechanism to obscure samples vs. time, this has to be tracked elsewhere!
@@ -197,20 +198,19 @@ public class StageFeatureWrite extends Stage {
         ByteBuffer bbuffer = ByteBuffer.allocate(bufferSize);
         FloatBuffer fbuffer = bbuffer.asFloatBuffer();
 
-        fbuffer.put(relTimestamp);
+        fbuffer.put(new float[]{(float)relTimestamp[0] / samplingrate, (float)relTimestamp[1] / samplingrate});
 
         // send UDP packets. Only passes the first array!
         if ((isUdp == 1) && (data[0][0] == 1)) {
-            NetworkIO.sendUdpPacket(timeFormatUdp.format(currentTime.plusMillis((long) (relTimestamp[0] * 1000))));
+            NetworkIO.sendUdpPacket(timeFormatUdp.format(currentTime.plusMillis((long) ((float)relTimestamp[0] / samplingrate * 1000.0))));
         }
 
         for (float[] aData : data) {
             fbuffer.put(aData);
         }
 
-        // round to 5 decimals -> xx.xx milliseconds.
-        relTimestamp[0] = Math.round((relTimestamp[0] + hopDuration) * 100000.0f) / 100000.0f;
-        relTimestamp[1] = Math.round((relTimestamp[1] + hopDuration) * 100000.0f) / 100000.0f;
+        relTimestamp[0] = relTimestamp[0] + hopDuration;
+        relTimestamp[1] = relTimestamp[1] + hopDuration;
 
         try {
             featureRAF.getChannel().write(bbuffer);
