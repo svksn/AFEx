@@ -142,7 +142,7 @@ public class StageFeatureWrite extends Stage {
         }
 
         // add length of last feature file to current time
-        currentTime = currentTime.plusMillis((long) ((float)(relTimestamp[0]) / (float)mySamplingRate * 1000.0));
+        currentTime = currentTime.plusMillis((long) ((float)(relTimestamp[0]) / (float)samplingrate * 1000.0));
         timestamp = timeFormat.format(currentTime);
 
         try {
