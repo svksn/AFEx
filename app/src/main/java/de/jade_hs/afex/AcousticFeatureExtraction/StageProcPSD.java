@@ -110,7 +110,7 @@ public class StageProcPSD extends Stage {
             dataConj = new float[channels][];
             P = Ptemp = new float[3][nfft * 2];
 
-            for (int iChannel = 0; iChannel < data.length; iChannel++) {
+            for (int iChannel = 0; iChannel < channels; iChannel++) {
 
                 // window
                 for (int i = 0; i < samples; i++) {
