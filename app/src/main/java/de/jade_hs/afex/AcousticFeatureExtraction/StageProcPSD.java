@@ -117,7 +117,7 @@ public class StageProcPSD extends Stage {
 
             data = new float[channels][nfft * 2];
 
-            for (int iChannel = 0; iChannel < data.length; iChannel++) {
+            for (int iChannel = 0; iChannel < channels; iChannel++) {
 
                 // window
                 for (int i = 0; i < samples; i++) {
