@@ -10,8 +10,6 @@ import java.nio.FloatBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import edu.ucsd.sccn.LSL;
-
 /**
  * Feature extraction: Auto- and cross correlation
  *
@@ -30,54 +28,13 @@ public class StageProcPSD extends Stage {
 
     CPSD cpsd;
 
-    private LSL.StreamInfo info;
-    private LSL.StreamOutlet outlet;
-    private int isLsl;
-    private int fsLsl;
-
     public StageProcPSD(HashMap parameter) {
         super(parameter);
         cpsd = new CPSD();
-
-        if (parameter.get("lsl") == null)
-            isLsl = 0;
-        else
-            isLsl = Integer.parseInt((String) parameter.get("lsl"));
-
-        if (isLsl == 1) {
-
-            if (parameter.get("lsl_rate") == null)
-                fsLsl = 8;
-            else
-                fsLsl = Integer.parseInt((String) parameter.get("lsl"));
-
-            Log.d(LOG, "----------> " + id + ": LSL enabled (rate: " + fsLsl +" Hz)");
-
-            info = new LSL.StreamInfo(
-                    "AFEx",
-                    "psd",
-                    2 * cpsd.nfft + 2,
-                    fsLsl,
-                    LSL.ChannelFormat.float32,
-                    "AFEx");
-
-            try {
-                outlet = new LSL.StreamOutlet(info);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            Log.d(LOG, "----------> " + id + ": LSL disabled");
-        }
-
     }
 
     @Override
     protected void cleanup() {
-        if (isLsl == 1) {
-            //outlet.close();
-            //info.destroy();
-        }
         Log.d(LOG, "Stopped " + LOG);
     }
 
@@ -85,7 +42,6 @@ public class StageProcPSD extends Stage {
     protected void process(float[][] buffer) {
         cpsd.calculate(buffer);
     }
-
 
     private class CPSD {
 
@@ -190,18 +146,6 @@ public class StageProcPSD extends Stage {
                     for (int i = 1; i < nfft / 2; i++) {
                         dataOut[k][i] = 2 * Ptemp[k][2 * i] / samplingrate / win_energy;
                     }
-                }
-
-                if (isLsl == 1) {
-
-                    float[] dataLsl = new float[dataOut[0].length +
-                            dataOut[1].length + dataOut[2].length];
-
-                    System.arraycopy(dataOut[0], 0, dataLsl, 0, dataOut[0].length);
-                    System.arraycopy(dataOut[1], 0, dataLsl, dataOut[0].length, dataOut[1].length);
-                    System.arraycopy(dataOut[2], 0, dataLsl, dataOut[0].length + dataOut[1].length, dataOut[2].length);
-
-                    outlet.push_sample(dataLsl);
                 }
 
                 send(dataOut);

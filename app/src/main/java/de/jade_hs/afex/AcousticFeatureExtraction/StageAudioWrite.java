@@ -12,7 +12,6 @@ import java.util.Locale;
 
 import de.jade_hs.afex.Tools.AudioFileIO;
 
-import edu.ucsd.sccn.LSL;
 
 /**
  * Write raw audio to disk
@@ -27,11 +26,6 @@ public class StageAudioWrite extends Stage {
 
     final static Boolean ENABLED = false;
 
-    private LSL.StreamInfo info;
-    private LSL.StreamOutlet outlet;
-
-    private int isLsl;
-
     AudioFileIO io;
     DataOutputStream stream;
 
@@ -42,35 +36,6 @@ public class StageAudioWrite extends Stage {
 
     public StageAudioWrite(HashMap parameter) {
         super(parameter);
-
-        if (ENABLED) {
-            if (parameter.get("lsl") == null)
-                isLsl = 0;
-            else
-                isLsl = Integer.parseInt((String) parameter.get("lsl"));
-
-            if (isLsl == 1) {
-
-                Log.d(LOG, "----------> " + id + ": LSL enabled");
-
-                info = new LSL.StreamInfo(
-                        "RawAudio",
-                        "Audio",
-                        channels,
-                        blockSize,
-                        LSL.ChannelFormat.int8,
-                        "AFEx");
-
-                try {
-                    outlet = new LSL.StreamOutlet(info);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                Log.d(LOG, "----------> " + id + ": LSL disabled");
-            }
-        }
-
     }
 
     @Override
@@ -113,11 +78,6 @@ public class StageAudioWrite extends Stage {
 
         io.closeDataOutStream();
 
-        if (isLsl == 1) {
-            //outlet.close();
-            //info.destroy();
-        }
-
         Log.d(LOG, id + ": Stopped consuming");
     }
 
@@ -141,9 +101,6 @@ public class StageAudioWrite extends Stage {
 
         try {
             stream.write(dataOut);
-            if (isLsl == 1) {
-                outlet.push_sample(dataOut);
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }

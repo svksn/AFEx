@@ -10,7 +10,6 @@ public class StageProcMaxValue extends Stage {
 
     final static String LOG = "StageProcMaxValue";
 
-
     public StageProcMaxValue(HashMap parameter) {
         super(parameter);
     }
