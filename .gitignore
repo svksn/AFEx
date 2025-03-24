@@ -86,3 +86,4 @@ lint/tmp/
 
 # Annoying crap of Apple Fanboys
 *.DS_Store
+/app/src/main/assets/yamnet.tflite

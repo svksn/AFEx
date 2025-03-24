@@ -1,34 +1,70 @@
-apply plugin: 'com.android.application'
+plugins {
+    id('com.android.application')
+    id('org.jetbrains.kotlin.android')
+    id("de.undercouch.download") version "5.6.0"
+}
 
 android {
-    compileSdkVersion 29
+    compileSdk 35
     defaultConfig {
-        applicationId "de.jade_hs.afe"
-        minSdkVersion 24
-        targetSdkVersion 27
+        applicationId "de.jade_hs.afex"
+        minSdkVersion 26
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     namespace 'de.jade_hs.afex'
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
+// import DownloadModels task
+project.ext.ASSET_DIR = projectDir.toString() + '/src/main/assets'
+project.ext.TEST_ASSET_DIR = projectDir.toString() + '/src/androidTest/assets'
+apply from:'download_model.gradle'
+
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.github.wendykierp:JTransforms:3.1'
+
+    // tinylog logging framework
     implementation 'org.tinylog:tinylog:1.3.5'
-    implementation 'com.android.support:design:27.1.1'
+
+    // JTransforms FFT library
+    implementation 'com.github.wendykierp:JTransforms:3.1'
+
+    // ThreeTen Android Backport date and time library (TODO: deprecated)
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.1'
 
+    // Mediapipe Library
+    implementation 'com.google.mediapipe:tasks-audio:0.10.14'
+
+    // Kotlin lang
+    implementation 'androidx.core:core-ktx:1.7.0'
+
+    // App compat and UI things
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.fragment:fragment-ktx:1.5.5'
+
+    // Navigation library
+    def nav_version = "2.5.3"
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    // Unit testing
+    testImplementation 'junit:junit:4.13.2'
+
+    // Instrumented testing
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
 }

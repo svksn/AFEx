@@ -4,20 +4,27 @@ import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.ServiceConnection;
+import android.Manifest;
+import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,10 +33,19 @@ import de.jade_hs.afex.Tools.AudioFileIO;
 
 public class MainActivity extends AppCompatActivity {
 
+    Context context = this;
     FloatingActionButton fabStart;
     TextView textState;
     ControlService controlService;
     boolean isBound = false;
+
+    private String[] necessaryPermissions = {
+            Manifest.permission.FOREGROUND_SERVICE,
+            Manifest.permission.INTERNET,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         AndroidThreeTen.init(this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivity(intent);
+            }
+        }
 
         // check if configuration is present (1st start),
         // create one if necessary
@@ -49,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        //checkPermission();
 
         Intent intent = new Intent(this, ControlService.class);
 
@@ -78,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             if (isBound)
                 if (controlService == null || !controlService.isRunning()) {
                     Snackbar.make(view, "Starting Stage Manager", Snackbar.LENGTH_LONG).show();
-                    controlService.startStageManager();
+                    controlService.startStageManager(context);
                 } else {
                     Snackbar.make(view, "Stopping Stage Manager", Snackbar.LENGTH_LONG).show();
                     controlService.stopStageManager();
@@ -157,5 +182,30 @@ public class MainActivity extends AppCompatActivity {
             isBound = false;
         }
     };
+
+
+    public void checkPermission() {
+        for (String permission : necessaryPermissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{permission}, 1);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    checkPermission();
+                } else {
+                    Toast.makeText(this, "All Permissions must be granted", Toast.LENGTH_LONG).show();
+                    this.finish();
+                }
+                return;
+            }
+        }
+    }
 
 }

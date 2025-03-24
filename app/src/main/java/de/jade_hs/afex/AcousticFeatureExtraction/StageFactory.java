@@ -1,5 +1,7 @@
 package de.jade_hs.afex.AcousticFeatureExtraction;
 
+import android.content.Context;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -40,6 +42,12 @@ class StageFactory {
 
     private static String TAG = "StageFactory";
 
+    private Context context;
+
+    public StageFactory(Context context) {
+        this.context = context;
+    }
+
     /**
      * Parses a stage (i.e. feature extraction / processing) configuration from XML
      * The input argument must specify a valid XML-File.
@@ -52,6 +60,8 @@ class StageFactory {
     public Stage parseConfig(File stageConfig) {
 
         Stage stage = null;
+
+        System.out.println("----------------> BUILDER: " + stageConfig.getName());
 
         try {
             Document doc = DocumentBuilderFactory.newInstance()

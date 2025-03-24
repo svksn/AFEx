@@ -24,12 +24,13 @@ public class StageManager {
 
         Stage.samplingrate = 16000;
         Stage.channels = 2;
+
         Stage.context = context;
 
         // build processing tree
         File features = new File(Environment.getExternalStoragePublicDirectory(AudioFileIO.MAIN_FOLDER) + File.separator + AudioFileIO.STAGE_CONFIG);
 
-        mainStage = new StageFactory().parseConfig(features);
+        mainStage = new StageFactory(context).parseConfig(features);
 
     }
 

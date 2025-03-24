@@ -9,8 +9,9 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
 
 import de.jade_hs.afex.AcousticFeatureExtraction.StageManager;
 
@@ -22,7 +23,7 @@ public class ControlService extends Service {
 
     public final IBinder binder  = new LocalBinder();
 
-    StageManager stageManager = new StageManager(this);
+    StageManager stageManager;
 
     /**
      * Binder returns enclosing ControlService instance
@@ -43,6 +44,8 @@ public class ControlService extends Service {
         super.onStartCommand(intent, flags, startId);
 
         setNotification();
+
+        stageManager = new StageManager(getApplicationContext());
 
         Log.d(LOG, "Service started");
 
@@ -68,10 +71,9 @@ public class ControlService extends Service {
      * Methods for clients
      * */
 
-    public void startStageManager() {
+    public void startStageManager(Context context) {
 //        stageManager = new StageManager();
         stageManager.start();
-
     }
 
     public void stopStageManager() {
@@ -88,7 +90,7 @@ public class ControlService extends Service {
 
     public void setNotification() {
 
-        String NOTIFICATION_CHANEL_ID = "AFE";
+        String NOTIFICATION_CHANEL_ID = "AFEx";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANEL_ID,
