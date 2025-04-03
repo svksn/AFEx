@@ -2,8 +2,12 @@
 <stage feature="StageAudioCapture" id="10">
     <stage feature="StagePreHighpass" id="11" blocksize="400" cutoff_hz="250">
         <stage feature="StageProcPSD" id="12" blocksize="400" hopsize="200" blockout="2000" hopout="2000"/>
-        <stage feature="StageProcRMS" id="13" blocksize="400" hopsize="200"/>
+        <stage feature="StageProcRMS" id="13" blocksize="400" hopsize="200">
+            <stage feature="StageFeatureWrite" id="130" prefix="RMS" nfeatures="2"/>
+        </stage>
     </stage>
     <stage feature="StageProcOnsetDetection" id="20" blocksize="32" hopsize="32"/>
-    <stage feature="StageProcClassify" id="30" blocksize="15360" hopsize="15360"/>
+    <stage feature="StageProcClassify" id="30" blocksize="15600" hopsize="15360">
+        <stage feature="StageFeatureWrite" id="31" prefix="CLASS" nfeatures="12"/>
+    </stage>
 </stage>
