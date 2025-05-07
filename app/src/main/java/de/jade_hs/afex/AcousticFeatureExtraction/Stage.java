@@ -24,7 +24,7 @@ abstract class Stage extends TreeSet {
 
     static Context context;
 
-    final int timeout = 1000; // in ms, wait this long to receive data before stopping a stage.
+    final int timeout = 5000; // in ms, wait this long to receive data before stopping a stage, i.e. needs to be longer than the slowest feature.
 
     static Instant startTime;
     static int samplingrate;

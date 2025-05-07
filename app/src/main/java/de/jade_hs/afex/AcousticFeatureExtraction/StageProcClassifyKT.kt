@@ -32,7 +32,7 @@ internal class StageProcClassifyKT(parameter: HashMap<*, *>) : Stage(parameter) 
 
         audioClassifier = AudioClassifier.createFromOptions(context, options)
 
-        // input length for yamnet is 0.96 * 16000 = 15360 samples = blockSize
+        // input length for yamnet is 0.975 * 16000 = 15600 samples = blockSize
         audioData = AudioData.create(
             AudioData.AudioDataFormat.builder()
                 .setNumOfChannels(1)
