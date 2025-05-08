@@ -1,9 +1,12 @@
 package de.jade_hs.afex.AcousticFeatureExtraction;
 
+import android.Manifest;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
+
+import androidx.annotation.RequiresPermission;
 
 import org.threeten.bp.Instant;
 
@@ -22,6 +25,7 @@ public class StageAudioCapture extends Stage {
     private boolean stopRecording = false;
 
 
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
     public StageAudioCapture(HashMap parameter) {
         super(parameter);
 
@@ -40,12 +44,13 @@ public class StageAudioCapture extends Stage {
         Log.d(LOG, "Buffersize: " + buffersize);
 
         audioRecord = new AudioRecord(
-                MediaRecorder.AudioSource.VOICE_RECOGNITION,
+                MediaRecorder.AudioSource.UNPROCESSED,
                 samplingrate,
                 AudioFormat.CHANNEL_IN_STEREO,
                 AudioFormat.ENCODING_PCM_16BIT,
                 buffersize
         );
+
     }
 
 
