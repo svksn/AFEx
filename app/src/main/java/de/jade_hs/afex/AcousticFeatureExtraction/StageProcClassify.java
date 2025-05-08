@@ -48,6 +48,7 @@ public class StageProcClassify extends Stage {
     protected void process(float[][] buffer) {
 
         float[][] dataOut = new float[buffer.length][6]; // 3 results/channel, each with id and score interleaved
+        String resultUi = "";
 
         for (int channel = 0; channel < buffer.length; channel++) {
             audioData.load(buffer[channel]);
@@ -56,9 +57,12 @@ public class StageProcClassify extends Stage {
             for (int i = 0; i < 3; i++) {
                 dataOut[channel][i * 2] = result.classificationResults().get(0).classifications().get(0).categories().get(i).index();
                 dataOut[channel][i * 2 + 1] = result.classificationResults().get(0).classifications().get(0).categories().get(i).score();
+                resultUi =  result.classificationResults().get(0).classifications().get(0).categories().get(i).categoryName();
             }
-
         }
+        // send one result to UI
+        sendMessage("CLASS", resultUi);
+
         System.out.println(Arrays.deepToString(dataOut));
         send(dataOut);
     }

@@ -43,6 +43,7 @@ public class StageProcVAD extends Stage {
         //for (int i = 0; i < buffer.length; i++) {
         boolean isSpeech = vad.isSpeech(buffer[0]);
         System.out.println("----------------> VAD: " + isSpeech);
+        sendMessage("VAD", String.valueOf(isSpeech));
         //}
 
         //send(dataOut);

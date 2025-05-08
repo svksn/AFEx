@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements MessageListener {
 
     Context context = this;
     FloatingActionButton fabStart;
-    TextView textState, textDevice;
+    TextView textState, textDevice, textVAD, textClass;
     ControlService controlService;
     boolean isBound = false;
 
@@ -96,19 +96,26 @@ public class MainActivity extends AppCompatActivity implements MessageListener {
     @Override
     public void onMessage(String tag, String data) {
         if ("AUDIO_DEVICE_SELECTED".equals(tag) && data instanceof String) {
-            String deviceName = (String) data;
-
-            // Update the TextView with the device name
             runOnUiThread(() -> {
-                textDevice.setText("Current device: " + deviceName);
+                textDevice.setText("Current device: " + data);
+            });
+        } else if ("VAD".equals(tag) && data instanceof String) {
+            runOnUiThread(() -> {
+                textVAD.setText("VAD: " + data);
+            });
+        } else if ("CLASS".equals(tag) && data instanceof String) {
+            runOnUiThread(() -> {
+                textClass.setText("Class: " + data);
             });
         }
     }
 
     protected void setupUI() {
 
-        textState = (TextView) findViewById(R.id.state);
+        textState = findViewById(R.id.state);
         textDevice = findViewById(R.id.device);
+        textVAD = findViewById(R.id.vad);
+        textClass = findViewById(R.id.classify);
 
         fabStart = findViewById(R.id.fabStart);
         fabStart.setOnClickListener(new View.OnClickListener() {
