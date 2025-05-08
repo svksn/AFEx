@@ -1,8 +1,5 @@
 package de.jade_hs.afex.AcousticFeatureExtraction;
 
-
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import com.konovalov.vad.silero.Vad;
 import com.konovalov.vad.silero.VadSilero;
 import com.konovalov.vad.silero.config.FrameSize;
@@ -19,11 +16,14 @@ import java.util.HashMap;
 public class StageProcVAD extends Stage {
 
     final static String LOG = "StageProcVAD";
-    private final VadSilero vad;
+    private VadSilero vad;
 
     public StageProcVAD(HashMap parameter) {
         super(parameter);
+    }
 
+    @Override
+    void start(){
         vad = Vad.builder()
                 .setContext(context)
                 .setSampleRate(SampleRate.SAMPLE_RATE_16K)
@@ -32,8 +32,9 @@ public class StageProcVAD extends Stage {
                 .setSilenceDurationMs(300)
                 .setSpeechDurationMs(50)
                 .build();
-    }
 
+        super.start();
+    }
 
     @Override
     protected void process(float[][] buffer) {
@@ -49,7 +50,6 @@ public class StageProcVAD extends Stage {
 
     @Override
     protected void cleanup() {
-        super.cleanup();
         vad.close();
     }
 
