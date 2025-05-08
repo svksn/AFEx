@@ -7,6 +7,7 @@ import org.threeten.bp.Instant;
 
 import java.io.File;
 
+import de.jade_hs.afex.ControlService;
 import de.jade_hs.afex.Tools.AudioFileIO;
 
 /**
@@ -18,7 +19,7 @@ public class StageManager {
     Stage mainStage;
     public boolean isRunning = false;
 
-    public StageManager(Context context) {
+    public StageManager(Context context, ControlService service) {
 
         //android.os.Debug.waitForDebugger();
 
@@ -26,6 +27,7 @@ public class StageManager {
         Stage.channels = 2;
 
         Stage.context = context;
+        Stage.service = service;
 
         // build processing tree
         File features = new File(Environment.getExternalStoragePublicDirectory(AudioFileIO.MAIN_FOLDER) + File.separator + AudioFileIO.STAGE_CONFIG);

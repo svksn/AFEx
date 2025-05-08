@@ -14,14 +14,17 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 import de.jade_hs.afex.AcousticFeatureExtraction.StageManager;
+import de.jade_hs.afex.AcousticFeatureExtraction.MessageListener;
 
-public class ControlService extends Service {
+public class ControlService extends Service implements MessageListener {
 
     public static final String LOG = "ControlService";
 
     public static final int NOTIFICATION_ID = 1;
 
     public final IBinder binder  = new LocalBinder();
+
+    private MessageListener callback;
 
     StageManager stageManager;
 
@@ -45,7 +48,7 @@ public class ControlService extends Service {
 
         setNotification();
 
-        stageManager = new StageManager(getApplicationContext());
+        stageManager = new StageManager(getApplicationContext(), this);
 
         Log.d(LOG, "Service started");
 
@@ -64,6 +67,20 @@ public class ControlService extends Service {
         clearNotification();
         Log.d(LOG, "Service destroyed");
         super.onDestroy();
+    }
+
+    @Override
+    public void onMessage(String tag, String data) {
+        if ("AUDIO_DEVICE_SELECTED".equals(tag)) {
+            Log.d("Service", "Received device info: " + data);
+        }
+        if (callback != null) {
+            callback.onMessage(tag, data);
+        }
+    }
+
+    public void setMessageListener(MessageListener callback) {
+        this.callback = callback;
     }
 
 

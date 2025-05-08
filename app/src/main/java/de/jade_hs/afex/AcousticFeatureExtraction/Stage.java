@@ -13,6 +13,8 @@ import java.util.TreeSet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import de.jade_hs.afex.ControlService;
+
 /**
  * Abstract class to implement producers (output), consumers (input) and conducers (in- and output).
  * Data is transferred using queues.
@@ -23,6 +25,9 @@ abstract class Stage extends TreeSet {
     final static String LOG = "Stage";
 
     static Context context;
+    static ControlService service;
+
+    protected MessageListener messageListener;
 
     final int timeout = 5000; // in ms, wait this long to receive data before stopping a stage, i.e. needs to be longer than the slowest feature.
 
@@ -68,6 +73,7 @@ abstract class Stage extends TreeSet {
         else
             hopSizeOut = Integer.parseInt((String) parameter.get("hopout"));
 
+        setMessageListener(service);
     }
 
 
@@ -224,5 +230,15 @@ abstract class Stage extends TreeSet {
     protected abstract void process(float[][] buffer);
 
     protected void cleanup() {}
+
+    public void setMessageListener(MessageListener listener) {
+        this.messageListener = listener;
+    }
+
+    protected void sendMessage(String tag, String data) {
+        if (messageListener != null) {
+            messageListener.onMessage(tag, data);
+        }
+    }
 
 }

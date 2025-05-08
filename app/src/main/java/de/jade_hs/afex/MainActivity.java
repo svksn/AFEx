@@ -29,13 +29,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import de.jade_hs.afex.AcousticFeatureExtraction.MessageListener;
 import de.jade_hs.afex.Tools.AudioFileIO;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MessageListener {
 
     Context context = this;
     FloatingActionButton fabStart;
-    TextView textState;
+    TextView textState, textDevice;
     ControlService controlService;
     boolean isBound = false;
 
@@ -92,9 +93,22 @@ public class MainActivity extends AppCompatActivity {
             unbindService(connection);
     }
 
+    @Override
+    public void onMessage(String tag, String data) {
+        if ("AUDIO_DEVICE_SELECTED".equals(tag) && data instanceof String) {
+            String deviceName = (String) data;
+
+            // Update the TextView with the device name
+            runOnUiThread(() -> {
+                textDevice.setText("Current device: " + deviceName);
+            });
+        }
+    }
+
     protected void setupUI() {
 
         textState = (TextView) findViewById(R.id.state);
+        textDevice = findViewById(R.id.device);
 
         fabStart = findViewById(R.id.fabStart);
         fabStart.setOnClickListener(new View.OnClickListener() {
@@ -117,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
         File file = new File(AudioFileIO.getMainPath() + File.separator + AudioFileIO.STAGE_CONFIG);
 
-        if (!file.exists()) {
+        //if (!file.exists()) {
 
             InputStream in = getResources().openRawResource(R.raw.features);
             FileOutputStream out = null;
@@ -141,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
+        //}
     }
 
     protected void updateUI() {
@@ -174,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
             ControlService.LocalBinder binder = (ControlService.LocalBinder) service;
             controlService = binder.getService();
+            controlService.setMessageListener(MainActivity.this);
             isBound = true;
         }
 
