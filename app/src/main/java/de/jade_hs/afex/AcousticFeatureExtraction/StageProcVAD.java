@@ -29,7 +29,7 @@ public class StageProcVAD extends Stage {
                 .setSampleRate(SampleRate.SAMPLE_RATE_16K)
                 .setFrameSize(FrameSize.FRAME_SIZE_512)
                 .setMode(Mode.NORMAL)
-                .setSilenceDurationMs(300)
+                .setSilenceDurationMs(100)
                 .setSpeechDurationMs(50)
                 .build();
 
@@ -39,14 +39,14 @@ public class StageProcVAD extends Stage {
     @Override
     protected void process(float[][] buffer) {
 
-        //float[][] dataOut = new float[buffer.length][1];
-        //for (int i = 0; i < buffer.length; i++) {
-        boolean isSpeech = vad.isSpeech(buffer[0]);
-        System.out.println("----------------> VAD: " + isSpeech);
-        sendMessage("VAD", String.valueOf(isSpeech));
-        //}
+        float[][] dataOut = new float[buffer.length][1];
+        for (int i = 0; i < buffer.length; i++) {
+            boolean isSpeech = vad.isSpeech(buffer[i]);
+            sendMessage("VAD", String.valueOf(isSpeech));
+            dataOut[i][0] = isSpeech ? 1 : 0;
+        }
 
-        //send(dataOut);
+        send(dataOut);
     }
 
     @Override
