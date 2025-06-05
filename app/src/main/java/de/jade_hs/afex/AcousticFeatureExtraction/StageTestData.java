@@ -49,8 +49,8 @@ public class StageTestData extends Stage {
 
             for (int k = 0; k < frames; k++) {
                 // split channels
-                dataOut[0][idx] = buffer[k * 2];
-                dataOut[1][idx] = buffer[k * 2 + 1];
+                dataOut[0][k] = buffer[k * 2];
+                dataOut[1][k] = buffer[k * 2 + 1];
             }
 
             send(dataOut);

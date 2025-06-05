@@ -7,6 +7,8 @@ import org.threeten.bp.format.DateTimeFormatter;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -24,7 +26,7 @@ public class StageAudioWrite extends Stage {
 
     final static String LOG = "StageConsumer";
 
-    final static Boolean ENABLED = false;
+    final static Boolean ENABLED = true;
 
     AudioFileIO io;
     DataOutputStream stream;
@@ -68,9 +70,7 @@ public class StageAudioWrite extends Stage {
             float[][] data = receive();
 
             if (data != null) {
-
                 process(data);
-
             } else {
                 abort = true;
             }
@@ -83,24 +83,19 @@ public class StageAudioWrite extends Stage {
 
 
     @Override
-    protected void process(float[][] buffer) {
+    protected void process(float[][] data) {
 
-        byte[] dataOut = new byte[buffer.length * buffer[0].length * 2];
 
-        for (int i = 0; i < buffer[0].length; i++) {
-
-            short tmp = (short) buffer[0][i];
-            dataOut[i * 4] = (byte) (tmp & 0xff);
-            dataOut[i * 4 + 1] = (byte) ((tmp >> 8) & 0xff);
-
-            tmp = (short) buffer[1][i];
-            dataOut[i * 4 + 2] = (byte) (tmp & 0xff);
-            dataOut[i * 4 + 3] = (byte) ((tmp >> 8) & 0xff);
-
+        ByteBuffer buffer = ByteBuffer.allocate(data.length * data[0].length * 2);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        for (int i = 0; i < data[0].length; i++) {
+            buffer.putShort((short) (data[0][i] * 32767));
+            buffer.putShort((short) (data[1][i] * 32767));
         }
 
         try {
-            stream.write(dataOut);
+            stream.write(buffer.array());
+            Log.d(LOG, id + ": Boink!");
         } catch (IOException e) {
             e.printStackTrace();
         }
