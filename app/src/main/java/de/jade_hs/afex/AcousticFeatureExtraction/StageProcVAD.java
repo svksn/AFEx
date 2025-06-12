@@ -29,15 +29,31 @@ public class StageProcVAD extends Stage {
                 .setSampleRate(SampleRate.SAMPLE_RATE_16K)
                 .setFrameSize(FrameSize.FRAME_SIZE_512)
                 .setMode(Mode.NORMAL)
-                .setSilenceDurationMs(100)
-                .setSpeechDurationMs(50)
                 .build();
+
+                /*.setSilenceDurationMs(100)
+                .setSpeechDurationMs(50)*/
 
         super.start();
     }
 
     @Override
     protected void process(float[][] buffer) {
+
+        // Normalise to [-1, 1], apparently this increases performance...
+        for (int i = 0; i < buffer.length; i++) {
+            float max = 0f;
+            for (float sample : buffer[i]) {
+                if (Math.abs(sample) > max) {
+                    max = Math.abs(sample);
+                }
+            }
+            if (max > 0) {
+                for (int j = 0; j < buffer[i].length; j++) {
+                    buffer[i][j] /= max;
+                }
+            }
+        }
 
         float[][] dataOut = new float[buffer.length][1];
         for (int i = 0; i < buffer.length; i++) {
