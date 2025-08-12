@@ -56,6 +56,9 @@ dependencies {
     // Yamnet VAD - https://github.com/gkonovalov/android-vad
     //implementation 'com.github.gkonovalov.android-vad:yamnet:2.0.9'
 
+    // ONNX Runtime
+    implementation 'com.microsoft.onnxruntime:onnxruntime-android:latest.release'
+
     // Kotlin lang
     implementation 'androidx.core:core-ktx:1.15.0'
 
