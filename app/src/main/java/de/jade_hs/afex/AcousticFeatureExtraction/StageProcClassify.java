@@ -62,8 +62,6 @@ public class StageProcClassify extends Stage {
         }
         // send one result to UI
         sendMessage("CLASS", resultUi);
-
-        System.out.println(Arrays.deepToString(dataOut));
         send(dataOut);
     }
 

@@ -29,10 +29,9 @@ public class StageProcVAD extends Stage {
                 .setSampleRate(SampleRate.SAMPLE_RATE_16K)
                 .setFrameSize(FrameSize.FRAME_SIZE_512)
                 .setMode(Mode.NORMAL)
+                .setSilenceDurationMs(10)
+                .setSpeechDurationMs(50)
                 .build();
-
-                /*.setSilenceDurationMs(100)
-                .setSpeechDurationMs(50)*/
 
         super.start();
     }
@@ -40,26 +39,26 @@ public class StageProcVAD extends Stage {
     @Override
     protected void process(float[][] buffer) {
 
-        // Normalise to [-1, 1], apparently this increases performance...
-        for (int i = 0; i < buffer.length; i++) {
+        // Normalise to [-1, 1], apparently this isn't done in Silero...
+        for (int channel = 0; channel < buffer.length; channel++) {
             float max = 0f;
-            for (float sample : buffer[i]) {
+            for (float sample : buffer[channel]) {
                 if (Math.abs(sample) > max) {
                     max = Math.abs(sample);
                 }
             }
             if (max > 0) {
-                for (int j = 0; j < buffer[i].length; j++) {
-                    buffer[i][j] /= max;
+                for (int sample = 0; sample < buffer[channel].length; sample++) {
+                    buffer[channel][sample] /= max;
                 }
             }
         }
 
         float[][] dataOut = new float[buffer.length][1];
-        for (int i = 0; i < buffer.length; i++) {
-            boolean isSpeech = vad.isSpeech(buffer[i]);
+        for (int channel = 0; channel < buffer.length; channel++) {
+            boolean isSpeech = vad.isSpeech(buffer[channel]);
             sendMessage("VAD", String.valueOf(isSpeech));
-            dataOut[i][0] = isSpeech ? 1 : 0;
+            dataOut[channel][0] = isSpeech ? 1 : 0;
         }
 
         send(dataOut);

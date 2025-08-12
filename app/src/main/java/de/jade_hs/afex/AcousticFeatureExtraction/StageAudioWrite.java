@@ -95,7 +95,6 @@ public class StageAudioWrite extends Stage {
 
         try {
             stream.write(buffer.array());
-            Log.d(LOG, id + ": Boink!");
         } catch (IOException e) {
             e.printStackTrace();
         }
