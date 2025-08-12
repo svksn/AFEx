@@ -2,12 +2,6 @@ package de.jade_hs.afex.AcousticFeatureExtraction;
 
 import android.content.Context;
 
-import com.konovalov.vad.silero.Vad;
-import com.konovalov.vad.silero.VadSilero;
-import com.konovalov.vad.silero.config.FrameSize;
-import com.konovalov.vad.silero.config.Mode;
-import com.konovalov.vad.silero.config.SampleRate;
-
 import ai.onnxruntime.OnnxTensor;
 import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
