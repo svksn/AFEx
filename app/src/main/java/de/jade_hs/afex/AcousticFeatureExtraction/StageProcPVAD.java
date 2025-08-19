@@ -58,10 +58,11 @@ public class StageProcPVAD extends Stage {
 
     @Override
     void start(){
-        // get onnx model path from assets
+        // get onnx model from assets
         File modelFile;
         try {
             modelFile = copyAssetToFile(context, "GRU_with_FiLM_advanced_v24.onnx");
+            copyAssetToFile(context, "GRU_with_FiLM_advanced_v24.onnx.data");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -193,14 +194,15 @@ public class StageProcPVAD extends Stage {
         }*/
 
         float[][] dataOut = new float[buffer.length][4];
-        for (int channel = 0; channel < buffer.length; channel++) {
+        //for (int channel = 0; channel < buffer.length; channel++) {
+        int channel = 0;
             try {
                 dataOut[channel] = processAudio(buffer[channel]);
-                System.out.printf("%s\n", java.util.Arrays.toString(dataOut[channel]));
+                System.out.printf("pVAD: %s\n", java.util.Arrays.toString(dataOut[channel]));
             } catch (OrtException e) {
                 throw new RuntimeException(e);
             }
-        }
+        //}
 
         send(dataOut);
     }
