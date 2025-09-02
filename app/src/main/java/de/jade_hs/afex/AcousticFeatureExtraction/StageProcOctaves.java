@@ -122,11 +122,11 @@ public class StageProcOctaves extends Stage {
             if (block == blocks_tau) {
                 send(rms_temp);
                 // TODO: remove debugging output:
-                float[] out = new float[F_CENTER.length];
+                /*float[] out = new float[F_CENTER.length];
                 for (int i = 0; i < F_CENTER.length; i++) {
                     out[i] =  20.0f * (float) Math.log10(rms_temp[0][i] + 1e-12);
                 }
-                Log.d(LOG, Arrays.toString(out));
+                Log.d(LOG, Arrays.toString(out)); */
                 block = 0;
             }
         }
