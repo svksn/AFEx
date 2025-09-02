@@ -58,7 +58,7 @@ public class StageFeatureWrite extends Stage {
     private int hopDuration;
     private int[] relTimestamp;
 
-    private float featFileSize = 60; // size of feature files in seconds.
+    private float featFileSize = 60; // size/content of feature files in seconds.
 
     DateTimeFormatter timeFormat =
             DateTimeFormatter.ofPattern("uuuuMMdd_HHmmssSSS")
@@ -80,7 +80,6 @@ public class StageFeatureWrite extends Stage {
             isUdp = 0;
         else
             isUdp = Integer.parseInt((String) parameter.get("udp"));
-
     }
 
     @Override
@@ -113,7 +112,18 @@ public class StageFeatureWrite extends Stage {
             float[][] data = receive();
 
             if (data != null) {
-                process(data);
+                // we never want to write passed through data, as this should take place in its own
+                // writer instance. if passthrough is enabled, the last channel contains the
+                // feature data, so this is copied to a new array and then processed/written. the
+                // array format has to be handled properly in the stage that packages the data, e.g.
+                // the VAD stage. passthrough must be set in the XML configuration of both stages.
+                if (passThrough) {
+                    float[][] tmp = new float[1][];
+                    tmp[0] = data[data.length - 1].clone();
+                    process(tmp);
+                } else{
+                    process(data);
+                }
             } else {
                 abort = true;
             }
