@@ -18,6 +18,11 @@ public class StageProcVAD extends Stage {
     final static String LOG = "StageProcVAD";
     private VadSilero vad;
 
+    // passthrough sends the audio data along with the corresponding VAD results to enable
+    // conditional processing in attached stages. VAD data is a single value for each audio channel
+    // in the last channel of the output array, i.e. the first value corresponds to the 1st channel.
+    final static boolean passthrough = false;
+
     public StageProcVAD(HashMap parameter) {
         super(parameter);
     }
@@ -39,7 +44,7 @@ public class StageProcVAD extends Stage {
     @Override
     protected void process(float[][] buffer) {
 
-        // Normalise to [-1, 1], apparently this isn't done in Silero...
+        // Normalise to [-1, 1], apparently this isn't done in Silero   ...
         for (int channel = 0; channel < buffer.length; channel++) {
             float max = 0f;
             for (float sample : buffer[channel]) {
@@ -54,11 +59,20 @@ public class StageProcVAD extends Stage {
             }
         }
 
-        float[][] dataOut = new float[buffer.length][1];
+        int outchannels = 1;
+        if (passthrough) {
+            outchannels += buffer.length;
+        }
+        float[][] dataOut = new float[outchannels][]; // VAD data
+        dataOut[outchannels-1] = new float[buffer.length];
         for (int channel = 0; channel < buffer.length; channel++) {
             boolean isSpeech = vad.isSpeech(buffer[channel]);
             sendMessage("VAD", String.valueOf(isSpeech));
-            dataOut[channel][0] = isSpeech ? 1 : 0;
+            dataOut[outchannels-1][channel] = isSpeech ? 1.0f : 0.0f;
+            if (passthrough) {
+                dataOut[channel] = new float[buffer[channel].length];
+                System.arraycopy(buffer[channel], 0, dataOut[channel], 0, buffer[channel].length);
+            }
         }
 
         send(dataOut);

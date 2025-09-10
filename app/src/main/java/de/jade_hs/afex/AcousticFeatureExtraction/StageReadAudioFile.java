@@ -41,7 +41,7 @@ public class StageReadAudioFile extends Stage {
 
         AssetManager assetManager = context.getAssets();
         try {
-            stream = assetManager.open("input.wav");
+            stream = assetManager.open("input_.wav");
             // skip wav header (44 bytes)
             stream.skip(44);
         } catch (IOException e) {
@@ -83,7 +83,7 @@ public class StageReadAudioFile extends Stage {
                 // short breaks to prevent memory issues with feeding the
                 // processing chain too quickly.
                 try {
-                    Thread.sleep(1);
+                    Thread.sleep(16);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;

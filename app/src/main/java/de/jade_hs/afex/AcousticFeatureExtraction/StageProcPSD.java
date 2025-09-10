@@ -169,7 +169,7 @@ public class StageProcPSD extends Stage {
 
             // calculate window
             for (int i = 0; i < samples; i++) {
-                window[i] = (float) (0.5 - 0.5 * Math.cos(2 * Math.PI * (float) i / samples));
+                window[i] = (float) (0.5 - 0.5 * Math.cos(2 * Math.PI * (float) i / samples - 1));
             }
 
             return window;
