@@ -13,7 +13,7 @@ import de.jade_hs.afex.Tools.AudioFileIO;
 
 
 /**
- * Read audio file for testing and debugging
+ * Read audio file for testing and debugging. Expects 16 kHz, stereo wav file.
  */
 
 public class StageReadAudioFile extends Stage {
@@ -21,7 +21,6 @@ public class StageReadAudioFile extends Stage {
     final static String LOG = "StageProducer";
 
     private int channels, frames;
-    AudioFileIO io;
     InputStream stream;
     private boolean stopProducing = false;
 
@@ -33,7 +32,6 @@ public class StageReadAudioFile extends Stage {
 
         channels = 2;
         frames = 1024;
-
     }
 
     @Override
@@ -41,7 +39,7 @@ public class StageReadAudioFile extends Stage {
 
         AssetManager assetManager = context.getAssets();
         try {
-            stream = assetManager.open("input_.wav");
+            stream = assetManager.open("cache_20250904_111131920_kueche.wav");
             // skip wav header (44 bytes)
             stream.skip(44);
         } catch (IOException e) {
@@ -83,7 +81,7 @@ public class StageReadAudioFile extends Stage {
                 // short breaks to prevent memory issues with feeding the
                 // processing chain too quickly.
                 try {
-                    Thread.sleep(16);
+                    Thread.sleep(5);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
@@ -98,7 +96,6 @@ public class StageReadAudioFile extends Stage {
         }
 
         Log.d(LOG, "Stopped producing");
-
     }
 
 
@@ -106,7 +103,6 @@ public class StageReadAudioFile extends Stage {
     public void setStopProducing() {
 
         stopProducing = true;
-
     }
 
 }
