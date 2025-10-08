@@ -1,10 +1,8 @@
 package de.jade_hs.afex.AcousticFeatureExtraction;
+import de.jade_hs.afex.Processing.Utilities;
 
 import android.util.Log;
-
 import org.jtransforms.fft.FloatFFT_1D;
-
-import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -49,11 +47,11 @@ public class StageProcOctaves extends Stage {
 
         Octaves() {
 
-            nfft = nextpow2(blockSize);
+            nfft = Utilities.nextpow2(blockSize);
             System.out.println("----------------> NFFT: " + nfft);
 
             // window & energy
-            window = hann(blockSize);
+            window = Utilities.hann(blockSize);
             for (float i : window) {
                 win_energy += i * i;
             }
@@ -129,22 +127,6 @@ public class StageProcOctaves extends Stage {
                 Log.d(LOG, Arrays.toString(out)); */
                 block = 0;
             }
-        }
-
-        private int nextpow2(int x) {
-
-            return 1 << (32 - Integer.numberOfLeadingZeros(x - 1));
-        }
-
-        private float[] hann(int samples) {
-
-            float[] window = new float[samples];
-
-            // calculate window
-            for (int i = 0; i < samples; i++) {
-                window[i] = (float) (0.5 - 0.5 * Math.cos(2 * Math.PI * (float) i / samples - 1));
-            }
-            return window;
         }
 
         private int[][] bins() {
