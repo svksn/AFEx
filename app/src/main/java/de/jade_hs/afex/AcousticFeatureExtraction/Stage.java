@@ -39,6 +39,7 @@ abstract class Stage extends TreeSet {
 
     private Thread thread;
     private LinkedBlockingQueue<float[][]> inQueue;
+    protected boolean hasInQueue() {return (inQueue != null);}
     private Set<LinkedBlockingQueue> outQueue = new HashSet<>();
 
     Stage inStage;
@@ -46,7 +47,7 @@ abstract class Stage extends TreeSet {
 
     // params to set via constructor
     int id, blockSize, hopSize, blockSizeOut, hopSizeOut;
-    boolean passThrough;
+    boolean passthrough;
 
     public Stage(HashMap parameter) {
 
@@ -75,13 +76,14 @@ abstract class Stage extends TreeSet {
             hopSizeOut = Integer.parseInt((String) parameter.get("hopout"));
 
         // passthrough sends the audio data along with the corresponding corresponding results to enable
-        // conditional processing in attached stages. Currently only used for VAD, which is a single value
-        // for each audio channel in the last channel of the output array, i.e. the first value corresponds
-        // to the 1st channel, and for FeatureWrite to prevent writing of passed through data.
+        // conditional processing in attached stages. this needs to be implemented in the specific stage
+        // by setting up the output array accordingly. the feature data needs to be in the last array.
+        // if enabled, StageFeatureWrite omits everything but the last array to prevent writing passed
+        // through data.
         if (parameter.get("passthrough") == null)
-            passThrough = false;
+            passthrough = false;
         else
-            passThrough = Boolean.parseBoolean((String) parameter.get("passthrough"));
+            passthrough = Boolean.parseBoolean((String) parameter.get("passthrough"));
 
         setMessageListener(service);
     }
