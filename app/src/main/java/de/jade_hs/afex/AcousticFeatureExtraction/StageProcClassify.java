@@ -6,11 +6,14 @@ import com.google.mediapipe.tasks.audio.core.RunningMode;
 import com.google.mediapipe.tasks.components.containers.AudioData;
 import com.google.mediapipe.tasks.core.BaseOptions;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 /**
  * Feature: Audio Classification using yamnet
+ * Example configuration:
+ * <stage feature="StageProcClassify" id="30" blocksize="15360" hopsize="15360">
+ *     <stage feature="StageFeatureWrite" id="31" prefix="CLASS" nfeatures="12"/>
+ * </stage>
  */
 
 public class StageProcClassify extends Stage {
@@ -31,7 +34,6 @@ public class StageProcClassify extends Stage {
                     .setRunningMode(RunningMode.AUDIO_CLIPS)
                     .setMaxResults(3)
                     .build();
-        ;
 
         audioClassifier = AudioClassifier.createFromOptions(context, options);
 
