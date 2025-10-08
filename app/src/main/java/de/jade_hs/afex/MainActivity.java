@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements MessageListener {
 
     Context context = this;
     FloatingActionButton fabStart;
-    TextView textState, textDevice, textVAD, textClass;
+    TextView textState, textDevice, textVAD, textPVAD, textClass;
     ControlService controlService;
     boolean isBound = false;
 
@@ -95,15 +95,19 @@ public class MainActivity extends AppCompatActivity implements MessageListener {
 
     @Override
     public void onMessage(String tag, String data) {
-        if ("AUDIO_DEVICE_SELECTED".equals(tag) && data instanceof String) {
+        if ("AUDIO_DEVICE_SELECTED".equals(tag) && data != null) {
             runOnUiThread(() -> {
                 textDevice.setText("Current device: " + data);
             });
-        } else if ("VAD".equals(tag) && data instanceof String) {
+        } else if ("VAD".equals(tag) && data != null) {
             runOnUiThread(() -> {
                 textVAD.setText("VAD: " + data);
             });
-        } else if ("CLASS".equals(tag) && data instanceof String) {
+        } else if ("pVAD".equals(tag) && data != null) {
+            runOnUiThread(() -> {
+                textPVAD.setText("pVAD: " + data);
+            });
+        } else if ("CLASS".equals(tag) && data != null) {
             runOnUiThread(() -> {
                 textClass.setText("Class: " + data);
             });
@@ -115,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements MessageListener {
         textState = findViewById(R.id.state);
         textDevice = findViewById(R.id.device);
         textVAD = findViewById(R.id.vad);
+        textPVAD = findViewById(R.id.pvad);
         textClass = findViewById(R.id.classify);
 
         fabStart = findViewById(R.id.fabStart);
@@ -140,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements MessageListener {
 
         //if (!file.exists()) {
 
-            InputStream in = getResources().openRawResource(R.raw.features);
+            InputStream in = getResources().openRawResource(R.raw.imfit);
             FileOutputStream out = null;
 
             try {

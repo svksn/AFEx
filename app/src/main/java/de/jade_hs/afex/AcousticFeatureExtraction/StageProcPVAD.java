@@ -7,6 +7,7 @@ import ai.onnxruntime.OrtEnvironment;
 import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
 import ai.onnxruntime.OrtSession.Result;
+import de.jade_hs.afex.Processing.Utilities;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,8 +16,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.FloatBuffer;
 import java.util.Map;
-//import javax.sound.sampled.AudioInputStream;
-//import javax.sound.sampled.AudioSystem;
 
 import java.util.HashMap;
 
@@ -61,8 +60,8 @@ public class StageProcPVAD extends Stage {
         // get onnx model from assets
         File modelFile;
         try {
-            modelFile = copyAssetToFile(context, "GRU_with_FiLM_advanced_v24.onnx");
-            copyAssetToFile(context, "GRU_with_FiLM_advanced_v24.onnx.data");
+            modelFile = Utilities.copyAssetToFile(context, "GRU_with_FiLM_advanced_v24.onnx");
+            Utilities.copyAssetToFile(context, "GRU_with_FiLM_advanced_v24.onnx.data");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -178,21 +177,6 @@ public class StageProcPVAD extends Stage {
     @Override
     protected void process(float[][] buffer) {
 
-        // Normalise to [-1, 1], apparently this isn't done in Silero...
-        /*for (int channel = 0; channel < buffer.length; channel++) {
-            float max = 0f;
-            for (float sample : buffer[channel]) {
-                if (Math.abs(sample) > max) {
-                    max = Math.abs(sample);
-                }
-            }
-            if (max > 0) {
-                for (int sample = 0; sample < buffer[channel].length; sample++) {
-                    buffer[channel][sample] /= max;
-                }
-            }
-        }*/
-
         float[][] dataOut = new float[buffer.length][4];
         //for (int channel = 0; channel < buffer.length; channel++) {
         int channel = 0;
@@ -215,23 +199,6 @@ public class StageProcPVAD extends Stage {
             throw new RuntimeException(e);
         }
         env.close();
-    }
-
-    private File copyAssetToFile(Context context, String assetName) throws IOException {
-        File outFile = new File(context.getFilesDir(), assetName);
-        if (!outFile.exists()) { // Only copy once
-            try (InputStream is = context.getAssets().open(assetName);
-                 OutputStream os = new FileOutputStream(outFile)) {
-
-                byte[] buffer = new byte[4096];
-                int read;
-                while ((read = is.read(buffer)) != -1) {
-                    os.write(buffer, 0, read);
-                }
-                os.flush();
-            }
-        }
-        return outFile;
     }
 
 }
