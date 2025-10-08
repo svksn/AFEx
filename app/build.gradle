@@ -45,7 +45,8 @@ dependencies {
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.1'
 
     // mediapipe Library
-    implementation 'com.google.mediapipe:tasks-audio:0.20230731'
+    //implementation 'com.google.mediapipe:tasks-audio:0.20230731'
+    implementation 'com.google.mediapipe:tasks-audio:0.10.26.1'
 
     // WebRTC VAD - https://github.com/gkonovalov/android-vad
     //implementation 'com.github.gkonovalov.android-vad:webrtc:2.0.9'
@@ -62,7 +63,7 @@ dependencies {
     // Kotlin lang
     implementation 'androidx.core:core-ktx:1.15.0'
 
-    // App compat and UI things
+    // App compat and UI
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
