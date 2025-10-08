@@ -85,6 +85,7 @@ public class StageFeatureWrite extends Stage {
     @Override
     void start(){
 
+        passthrough = inStage.passthrough;
         startTime = Stage.startTime;
         currentTime = startTime;
         relTimestamp = new int[]{0, 0};
@@ -116,8 +117,8 @@ public class StageFeatureWrite extends Stage {
                 // writer instance. if passthrough is enabled, the last channel contains the
                 // feature data, so this is copied to a new array and then processed/written. the
                 // array format has to be handled properly in the stage that packages the data, e.g.
-                // the VAD stage. passthrough must be set in the XML configuration of both stages.
-                if (passThrough) {
+                // the VAD stage.
+                if (passthrough) {
                     float[][] tmp = new float[1][];
                     tmp[0] = data[data.length - 1].clone();
                     process(tmp);
