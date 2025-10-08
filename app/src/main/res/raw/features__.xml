@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<stage feature="StageReadAudioFile" id="10">
+    <stage feature="StagePreHighpass" id="11" blocksize="400" cutoff_hz="100">
+        <stage feature="StageProcPSD" id="12" blocksize="400" hopsize="200" blockout="2000" hopout="2000">
+            <stage feature="StageFeatureWrite" id="120" prefix="PSD" nfeatures="1026"/>
+        </stage>
+        <stage feature="StageProcRMS" id="13" blocksize="400" hopsize="200">
+            <stage feature="StageFeatureWrite" id="130" prefix="RMS" nfeatures="2"/>
+        </stage>
+    </stage>
+    <stage feature="StageProcOctaves" id="14" blocksize="400" hopsize="200" blockout="8000" hopout="8000">
+        <stage feature="StageFeatureWrite" id="140" prefix="Oct" nfeatures="18"/>
+    </stage>
+    <stage feature="StageProcOnsetDetection" id="20" blocksize="32" hopsize="32"/>
+    <stage feature="StageProcCombinedVAD" id="40" blocksize="256" hopsize="256" passthrough="true">
+        <stage feature="StageFeatureWrite" id="41" prefix="CombinedVAD" nfeatures="5" passthrough="true"/>
+    </stage>
+    <stage feature="StageProcVAD" id="42" blocksize="512" hopsize="512" passthrough="true">
+        <stage feature="StageFeatureWrite" id="43" prefix="VAD" nfeatures="1" passthrough="true"/>
+    </stage>
+    <stage feature="StageAudioWrite" id="50" blocksize="4096" hopsize="4096"/>
+    <stage feature="StageProcClassify" id="90" blocksize="15360" hopsize="15360">
+        <stage feature="StageFeatureWrite" id="91" prefix="CLASS" nfeatures="12"/>
+    </stage>
+</stage>
